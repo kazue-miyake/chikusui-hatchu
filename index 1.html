@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>竹酔 発注管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#2e7d4f;      /* 竹＝メインの緑 */
+  --green-dark:#1d5c38;
+  --green-pale:#e8f3ec;
+  --ink:#22302a;
+  --paper:#f4f6f2;
+  --card:#ffffff;
+  --line:#d7ded8;
+  --amber:#b45309;      /* 前回発注情報 */
+  --amber-pale:#fef3e2;
+  --red:#c0392b;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.6;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;font-size:16px;}
+
+/* ===== ヘッダー ===== */
+header{background:var(--green-dark);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;}
+header .mark{width:34px;height:34px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;flex-shrink:0;}
+header h1{font-size:17px;font-weight:700;letter-spacing:.05em;flex:1;}
+header h1 small{font-weight:400;font-size:12px;opacity:.75;margin-left:6px;}
+.icon-btn{background:rgba(255,255,255,.14);border:none;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:500;}
+.icon-btn:active{background:rgba(255,255,255,.28);}
+
+/* ===== タブ ===== */
+nav.tabs{display:flex;background:#fff;border-bottom:2px solid var(--line);position:sticky;top:54px;z-index:49;}
+nav.tabs button{flex:1;padding:12px 4px;border:none;background:none;font-size:14px;font-weight:700;color:#7a8a80;border-bottom:3px solid transparent;position:relative;}
+nav.tabs button.active{color:var(--green-dark);border-bottom-color:var(--green);}
+nav.tabs .badge{position:absolute;top:6px;right:calc(50% - 42px);background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:10px;min-width:18px;height:18px;line-height:18px;padding:0 4px;}
+
+main{max-width:1080px;margin:0 auto;padding:14px 14px 110px;}
+.tab-page{display:none;}
+.tab-page.active{display:block;}
+
+/* ===== 発注先チップ ===== */
+.supplier-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;-webkit-overflow-scrolling:touch;}
+.supplier-scroll::-webkit-scrollbar{height:0;}
+.chip{flex-shrink:0;border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:8px 14px;font-size:13.5px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:6px;}
+.chip .n{font-size:11px;color:#8a978f;font-weight:700;}
+.chip.active{background:var(--green);border-color:var(--green);color:#fff;}
+.chip.active .n{color:#cfe8da;}
+.chip.incart{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset;}
+
+/* ===== 検索 ===== */
+.search-row{display:flex;gap:8px;margin-bottom:10px;}
+.search-row input{flex:1;border:1.5px solid var(--line);border-radius:var(--radius);padding:10px 14px;background:#fff;}
+.search-row input:focus{outline:none;border-color:var(--green);}
+.search-hint{font-size:12px;color:#8a978f;margin:-4px 0 10px 4px;}
+
+/* ===== 発注先情報バー ===== */
+.supplier-info{background:var(--green-pale);border:1px solid #c6dfd0;border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:13px;display:none;}
+.supplier-info.show{display:block;}
+.supplier-info b{font-size:15px;color:var(--green-dark);}
+.supplier-info .fx{margin-left:10px;color:#4a5a51;}
+.supplier-info .nt{color:#4a5a51;margin-top:2px;}
+
+/* ===== カテゴリタブ ===== */
+.cat-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;}
+.cat-tabs::-webkit-scrollbar{height:0;}
+.cat-btn{flex-shrink:0;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:12.5px;color:#5a6a61;}
+.cat-btn.active{background:var(--green-dark);border-color:var(--green-dark);color:#fff;font-weight:700;}
+.cat-btn.notorder{border-style:dashed;color:#9aa8a0;}
+
+/* ===== 品目リスト ===== */
+.items-head{display:flex;align-items:center;justify-content:space-between;margin:6px 0;}
+.items-head h2{font-size:15px;color:var(--green-dark);}
+.btn-add-item{border:1.5px dashed var(--green);background:#fff;color:var(--green-dark);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;}
+.item-row{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:center;}
+.item-row.dim{opacity:.62;}
+.item-main{flex:1;min-width:0;}
+.item-name{font-weight:700;font-size:14.5px;line-height:1.4;}
+.item-name .code{font-weight:400;color:#8a978f;font-size:12px;}
+.item-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;font-size:11.5px;}
+.tag-unit{background:#eef2ee;border-radius:5px;padding:1px 7px;color:#5a6a61;}
+.tag-sup{background:var(--green-pale);border-radius:5px;padding:1px 7px;color:var(--green-dark);font-weight:700;}
+.item-note{font-size:12px;color:#7a8a80;margin-top:2px;line-height:1.45;}
+.item-prev{font-size:11.5px;color:var(--amber);background:var(--amber-pale);border-radius:5px;padding:1px 7px;display:inline-block;margin-top:3px;font-weight:500;}
+.item-edit-btns{display:flex;flex-direction:column;gap:4px;}
+.mini-btn{border:1px solid var(--line);background:#fff;border-radius:6px;width:30px;height:30px;font-size:13px;color:#7a8a80;}
+.item-ctrl{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;}
+.size-select{border:1.5px solid var(--line);border-radius:8px;padding:6px 6px;font-size:14px;background:#fff;max-width:110px;}
+.qty-box{display:flex;align-items:center;gap:0;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;background:#fff;}
+.qty-box.has{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.qty-box button{width:38px;height:40px;border:none;background:#f2f5f1;font-size:19px;font-weight:700;color:var(--green-dark);}
+.qty-box button:active{background:var(--green-pale);}
+.qty-box input{width:52px;height:40px;border:none;text-align:center;font-weight:700;font-size:16px;}
+.qty-box input:focus{outline:none;background:var(--green-pale);}
+.qty-unit{font-size:12px;color:#8a978f;}
+.no-items{background:#fff;border:1.5px dashed var(--line);border-radius:var(--radius);padding:34px 16px;text-align:center;color:#8a978f;font-size:14px;}
+
+/* ===== カート ===== */
+.cart-group{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+.cart-group-head{background:var(--green-pale);padding:9px 14px;font-weight:700;color:var(--green-dark);display:flex;justify-content:space-between;font-size:14px;}
+.cart-group-head .fx{font-weight:400;font-size:12px;color:#5a6a61;}
+.cart-group-head .reissue{background:var(--amber-pale);color:var(--amber);font-size:11px;border-radius:5px;padding:1px 7px;margin-left:6px;font-weight:700;}
+.cart-line{display:flex;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid #edf1ed;}
+.cart-line .nm{flex:1;font-size:13.5px;min-width:0;}
+.cart-line .nm .sz{color:var(--green-dark);font-weight:700;}
+.cart-line .qty-box{transform:scale(.92);transform-origin:right;}
+.cart-line .del{border:none;background:none;color:#b6c1ba;font-size:17px;width:32px;height:32px;}
+.cart-actions{display:flex;gap:10px;margin-top:14px;}
+.btn-primary{flex:1;background:var(--green);color:#fff;border:none;border-radius:var(--radius);padding:14px;font-size:16px;font-weight:700;letter-spacing:.04em;}
+.btn-primary:active{background:var(--green-dark);}
+.btn-ghost{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:14px 18px;font-size:14px;color:#7a8a80;}
+
+/* ===== モバイル用カートバー ===== */
+.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--green-dark);color:#fff;display:none;align-items:center;gap:10px;padding:11px 16px;z-index:60;box-shadow:0 -3px 12px rgba(0,0,0,.18);}
+.cart-bar.show{display:flex;}
+.cart-bar .info{flex:1;font-size:13.5px;}
+.cart-bar .info b{font-size:16px;}
+.cart-bar button{background:#fff;color:var(--green-dark);border:none;border-radius:9px;padding:10px 18px;font-weight:700;font-size:14px;}
+
+/* ===== 履歴 ===== */
+.hist-filters{display:flex;gap:8px;margin-bottom:12px;}
+.hist-filters select{flex:1;border:1.5px solid var(--line);border-radius:9px;padding:9px 10px;background:#fff;}
+.hist-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;}
+.hist-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hist-top .dt{font-weight:700;font-size:14px;}
+.hist-top .sp{background:var(--green-pale);color:var(--green-dark);font-weight:700;font-size:12px;border-radius:6px;padding:2px 8px;}
+.status{font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;margin-left:auto;}
+.status.ordered{background:#fdf0dc;color:#9a6b13;}
+.status.received{background:#e3f2e8;color:var(--green-dark);}
+.hist-items{font-size:13px;color:#4a5a51;margin:7px 0;line-height:1.7;}
+.hist-btns{display:flex;gap:8px;}
+.hist-btns button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:500;color:#4a5a51;}
+.hist-btns .ok{border-color:var(--green);color:var(--green-dark);}
+
+/* ===== モーダル ===== */
+.overlay{position:fixed;inset:0;background:rgba(20,30,25,.55);display:none;z-index:100;overflow-y:auto;padding:20px 12px;}
+.overlay.show{display:block;}
+.modal{background:#fff;border-radius:14px;max-width:760px;margin:0 auto;overflow:hidden;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;}
+.modal-head h3{font-size:16px;color:var(--green-dark);}
+.modal-close{border:none;background:#f2f5f1;border-radius:8px;width:34px;height:34px;font-size:16px;color:#5a6a61;}
+.modal-body{padding:16px 18px;}
+.modal-foot{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:10px;}
+.form-row{margin-bottom:12px;}
+.form-row label{display:block;font-size:12.5px;font-weight:700;color:#5a6a61;margin-bottom:4px;}
+.form-row input,.form-row select{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:10px 12px;}
+.form-row input:focus{outline:none;border-color:var(--green);}
+.form-hint{font-size:11.5px;color:#9aa8a0;margin-top:3px;}
+
+/* ===== 発注書プレビュー（画面上） ===== */
+.sheet{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+
+/* ===== 発注書（印刷・プレビュー共通の中身） ===== */
+.ps-head{display:flex;justify-content:space-between;align-items:flex-start;}
+.ps-to{font-size:17pt;font-weight:700;border-bottom:2px solid #000;padding-bottom:2px;display:inline-block;}
+.ps-tofax{font-size:11pt;margin-top:6px;}
+.ps-toextra{font-size:10.5pt;margin-top:2px;}
+.ps-from{text-align:left;font-size:10.5pt;line-height:1.7;}
+.ps-from .cn{font-size:13pt;font-weight:700;}
+.ps-title{text-align:center;font-size:19pt;font-weight:900;letter-spacing:1.2em;padding-left:1.2em;margin:10px 0 8px;}
+.ps-greet{font-size:11pt;line-height:1.8;margin:8px 0 10px;}
+.ps-dates{display:flex;justify-content:space-between;font-size:11pt;margin-bottom:8px;}
+table.ps-table{width:100%;border-collapse:collapse;font-size:11.5pt;}
+table.ps-table th,table.ps-table td{border:1.5px solid #000;padding:7px 9px;vertical-align:middle;}
+table.ps-table th{font-weight:700;text-align:center;background:#fff;}
+table.ps-table td.num{text-align:right;font-weight:700;width:72px;font-size:13pt;}
+table.ps-table td.unit{text-align:center;width:64px;}
+table.ps-table td.nt{font-size:9pt;color:#222;width:30%;}
+.ps-blank td{height:34px;}
+.ps-place{margin-top:10px;font-size:10.5pt;}
+.ps-note{margin-top:4px;font-size:9.5pt;line-height:1.6;}
+.ps-confirm{margin-top:14px;display:flex;justify-content:flex-end;}
+.ps-confirm .box{border:1.5px solid #000;width:220px;}
+.ps-confirm .box .lbl{border-bottom:1px solid #000;font-size:9.5pt;text-align:center;padding:2px;}
+.ps-confirm .box .sp{height:58px;}
+.ps-memo{margin-top:10px;border:1.5px solid #000;padding:7px 10px;font-size:10.5pt;line-height:1.7;white-space:pre-wrap;}
+.cart-note-input{display:block;width:100%;border:1px dashed var(--line);border-radius:6px;padding:5px 8px;font-size:12.5px;margin-top:4px;color:#4a5a51;background:#fbfcfa;}
+.cart-note-input:focus{outline:none;border-color:var(--green);border-style:solid;background:#fff;}
+.sheet-controls{background:var(--green-pale);border:1px solid #c6dfd0;border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.sheet-controls .sc-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:6px;}
+.sheet-controls .sc-row:last-child{margin-bottom:0;}
+.sheet-controls label{flex-shrink:0;width:70px;font-size:12.5px;font-weight:700;color:var(--green-dark);padding-top:8px;}
+.sheet-controls input,.sheet-controls textarea{flex:1;border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;background:#fff;}
+.sheet-controls input:focus,.sheet-controls textarea:focus{outline:none;border-color:var(--green);}
+
+/* ===== 印刷 ===== */
+.print-area{display:none;}
+@media print{
+  body *{visibility:hidden;}
+  header,nav.tabs,.cart-bar{display:none!important;}
+  .print-area,.print-area *{visibility:visible;}
+  .print-area{display:block;position:absolute;left:0;top:0;width:100%;background:#fff;}
+  .print-sheet{page-break-after:always;padding:8mm 6mm;}
+  .print-sheet:last-child{page-break-after:auto;}
+  @page{size:A4 portrait;margin:12mm;}
+}
+
+/* ===== レスポンシブ ===== */
+@media(max-width:720px){
+  main{padding:10px 10px 130px;}
+  header h1{font-size:15px;}
+  header h1 small{display:none;}
+  .item-row{flex-wrap:wrap;}
+  .item-ctrl{flex-direction:row;align-items:center;width:100%;justify-content:flex-end;}
+  .modal{border-radius:12px;}
+  .sheet{padding:12px;}
+  .hist-filters{flex-wrap:wrap;}
+}
+@media(max-width:380px){
+  .qty-box button{width:34px;}
+  .qty-box input{width:44px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mark">竹</div>
+  <h1>竹酔 発注管理<small>包材・備品</small></h1>
+  <button class="icon-btn" onclick="openManual()">📖 ルール</button>
+</header>
+
+<nav class="tabs">
+  <button id="tabBtn-order" class="active" onclick="showTab('order')">発注作成</button>
+  <button id="tabBtn-cart" onclick="showTab('cart')">カート<span class="badge" id="cartBadge" style="display:none">0</span></button>
+  <button id="tabBtn-history" onclick="showTab('history')">発注履歴</button>
+</nav>
+
+<main>
+  <!-- ===== 発注作成 ===== -->
+  <div class="tab-page active" id="page-order">
+    <div class="supplier-scroll" id="supplierChips"></div>
+    <div class="search-row">
+      <input type="search" id="searchInput" placeholder="品名で検索（全発注先から探せます）" oninput="onSearch()">
+    </div>
+    <div class="supplier-info" id="supplierInfo"></div>
+    <div class="cat-tabs" id="categoryTabs" style="display:none"></div>
+    <div class="items-head" id="itemsHead" style="display:none">
+      <h2 id="itemsTitle"></h2>
+      <button class="btn-add-item" onclick="openItemModal()">＋ 品目を追加</button>
+    </div>
+    <div id="itemsList"></div>
+  </div>
+
+  <!-- ===== カート ===== -->
+  <div class="tab-page" id="page-cart">
+    <div id="cartList"></div>
+    <div class="cart-actions" id="cartActions" style="display:none">
+      <button class="btn-ghost" onclick="clearCart()">全てクリア</button>
+      <button class="btn-primary" onclick="showPreview()">📄 発注書を作成する</button>
+    </div>
+  </div>
+
+  <!-- ===== 履歴 ===== -->
+  <div class="tab-page" id="page-history">
+    <div class="hist-filters">
+      <select id="histSupplier" onchange="renderHistory()"><option value="">すべての発注先</option></select>
+      <select id="histMonth" onchange="renderHistory()"><option value="">すべての月</option></select>
+    </div>
+    <div id="histList"></div>
+  </div>
+</main>
+
+<!-- モバイル カートバー -->
+<div class="cart-bar" id="cartBar">
+  <div class="info">カート <b id="cartBarCount">0</b> 品目（<span id="cartBarSup">0</span>社）</div>
+  <button onclick="showTab('cart')">カートを見る</button>
+</div>
+
+<!-- 発注書プレビュー モーダル -->
+<div class="overlay" id="previewOverlay">
+  <div class="modal" style="max-width:820px">
+    <div class="modal-head">
+      <h3>📄 発注書プレビュー</h3>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="modal-body" id="previewBody"></div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closePreview()">戻る</button>
+      <button class="btn-primary" onclick="printAndConfirm()">🖨 印刷して発注確定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 品目追加・編集 モーダル -->
+<div class="overlay" id="itemOverlay">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <h3 id="itemModalTitle">品目を追加</h3>
+      <button class="modal-close" onclick="closeItemModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label>品名 *</label><input id="fItemName" placeholder="例：TSR-8 黒 本体"></div>
+      <div class="form-row"><label>カテゴリ</label>
+        <select id="fItemCat"></select>
+        <input id="fItemNewCat" placeholder="新しいカテゴリ名" style="display:none;margin-top:6px">
+      </div>
+      <div class="form-row" style="display:flex;gap:10px">
+        <div style="flex:1"><label>単位</label><input id="fItemUnit" placeholder="ケース／袋／本 など"></div>
+        <div style="flex:1"><label>入数</label><input id="fItemUnitDetail" placeholder="例：2000入"></div>
+      </div>
+      <div class="form-row"><label>サイズ展開（あれば）</label><input id="fItemSizes" placeholder="例：S,M,L,LL（カンマ区切り）"><div class="form-hint">靴・ユニフォームなどサイズ指定がある品目のみ</div></div>
+      <div class="form-row"><label>備考</label><input id="fItemNote" placeholder="例：4ケース元払い"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeItemModal()">キャンセル</button>
+      <button class="btn-primary" id="itemSaveBtn" onclick="saveItem()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 発注ルール モーダル -->
+<div class="overlay" id="manualOverlay">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-head">
+      <h3>📖 発注のルール・メモ</h3>
+      <button class="modal-close" onclick="closeManual()">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:13.5px;line-height:1.9">
+      <p><b>■ 発注の基本</b><br>
+      ・当日お昼12:00までの発注なら当日手配（一部締切が早い物あり）<br>
+      ・納品は基本翌日〜3日後。1週間〜10日かかる物もある<br>
+      ・発注書の原本を控えておき、返信FAXが来たら差し替える<br>
+      ・牧野さんは返信FAXなし → 納品時にチェックしてくれるので出荷口のファイルに原本を挟む<br>
+      ・納品後、注文書と照らし合わせて問題なければ札を貼る</p>
+      <p><b>■ 月末・決算</b><br>
+      ・月末に頼む場合は翌月1日納品にし「翌月伝票でお願いします」と記載（例：9/1納品）<br>
+      ・<span style="color:var(--red);font-weight:700">7月は決算のため特に注意！</span> 在庫ストック分は翌月請求で発注</p>
+      <p><b>■ 日替わり（タカギ）</b><br>
+      ・毎週火曜日に在庫チェック<br>
+      ・ごはん屋折のシートで翌々週の水曜日までの必要折を計算して発注<br>
+      ・午前中発注→翌日納品（金曜発注→土曜納品も可）</p>
+      <p><b>■ 大口</b><br>
+      ・2週間前には物を揃えたいので確認して発注。納品後は「日付＋○○様＋個数」で確保<br>
+      ・大口注文 備品確認表：data→共有場所→事務所→別注<br>
+      ・折・フィルム・輪ゴム・のし・箸・段ボール・緑のゴム紐をチェック<br>
+      ・400個以上でのし有の物は、日付入りのしをラクスルで発注（データは栄養士の「別注写真」フォルダ）<br>
+      ・午後で食事時間が遅い注文は、専務に消費期限確認してから発注</p>
+      <p><b>■ モノタロウ</b><br>
+      ・土日10%クーポンの時に発注（トップページ中央にカレンダー有・適用されない物もある）</p>
+    </div>
+  </div>
+</div>
+
+<!-- 印刷用 -->
+<div class="print-area" id="printArea"></div>
+
+<script>
+// ============================================================
+// マスターデータ（備品発注書.xlsx 2026年版より全品目転記）
+// ============================================================
+const COMPANY = { name:'㈱竹酔', addr:'静岡市葵区田町2-89-1', fax:'054-255-4290', telDefault:'070-1218-0429' };
+
+const suppliers = [
+  { id:'takagi',   name:'タカギ産業',     printName:'タカギ産業',   fax:'052-504-5367', tel:'054-252-7948', tantou:'三宅', place:'出荷口 スロープ上がった台車の上に置き配', note:'毎週火曜に在庫チェック・午前発注→翌日納品／4c/s元払・未満1c/sにつき500円（抱合せOK）' },
+  { id:'makino',   name:'牧野',           printName:'牧野',         fax:'—',            tel:'',             tantou:'三宅', place:'', note:'返信FAXなし・納品時にチェック→出荷口のファイルに原本を挟む' },
+  { id:'origami',  name:'折政',           printName:'折政',         fax:'054-273-8794', tel:'',             tantou:'三宅', place:'裏倉庫', note:'午前発注→翌日納品' },
+  { id:'sangyo',   name:'産業社',         printName:'静岡産業社',   fax:'054-263-2325', tel:'',             tantou:'三宅', place:'', note:'月末締めの翌月払い ※揃い次第納品で翌月計上不可' },
+  { id:'azumi',    name:'アヅミ産業',     printName:'アヅミ産業',   fax:'048-654-5434', tel:'',             tantou:'三宅', place:'裏倉庫（直送は出荷口 台車の上に置き配）', note:'午前発注→木か金納品' },
+  { id:'shinmura', name:'新村商店',       printName:'新村商店',     fax:'054-201-9345', tel:'',             tantou:'三宅', place:'裏倉庫（直送は出荷口 台車の上に置き配）', note:'土曜も配達可' },
+  { id:'shingi',   name:'シンギ',         printName:'シンギ',       fax:'0538-23-7791', tel:'',             tantou:'三宅', place:'裏倉庫', note:'4ケース以上送料無料（運賃800円）・北原産業同士なら混載OK・返信来ない時あり／直送の場合「出荷口 スロープ上がった台車の上に置き配」を明記' },
+  { id:'sanwa',    name:'サンワキョーエー', printName:'サンワキョーエー', fax:'054-200-6880', tel:'',       tantou:'安本', place:'品目ごとに記載（⑲／おりべや⑤）', note:'' },
+  { id:'fuji',     name:'不二精機',       printName:'不二精機',     fax:'045-472-2724', tel:'',             tantou:'安本', place:'裏倉庫（直送は出荷口 台車の上に置き配）', note:'送料1,300円かかる' },
+  { id:'okawara',  name:'大川原紙器',     printName:'大川原紙器',   fax:'0548-32-7822', tel:'',             tantou:'安本', place:'裏倉庫', note:'午前発注→3日後納品' },
+  { id:'chemical', name:'静岡ケミカル',   printName:'静岡ケミカル', fax:'054-647-6011', tel:'',             tantou:'三宅', place:'裏倉庫（⑯番の棚へ）', note:'' },
+  { id:'bigmore',  name:'ビックモア',     printName:'ビックモア',   fax:'054-278-4766', tel:'054-252-7948', tantou:'三宅', place:'', note:'ユニフォーム・厨房シューズ／シューズは黒有り→注文の際は「黒で」と書く' },
+  { id:'tsukamoto',name:'つかもと印刷',   printName:'つかもと印刷', fax:'054-273-5093', tel:'',             tantou:'安本', place:'裏倉庫（直送は出荷口 台車の上に置き配）', note:'担当：高橋様／メール発注可（yasuhiro-takahashi@ukp.jp）', printExtra:'担当　高橋　様' },
+  { id:'karaage',  name:'唐揚げカップ業者', printName:'唐揚げカップ業者', fax:'—',      tel:'',             tantou:'三宅', place:'', note:'毎月25日（休日の場合は休み明け）来社' },
+];
+
+const baseItems = {
+takagi:{categories:['日替わり容器','別注容器','カップ・ケース','消耗品'],items:[
+ {id:'tk01',name:'TSR-8 黒 本体（ごはん小）',cat:'日替わり容器',unit:'ケース',unitDetail:'2000入',note:'日替わり・2週間分発注する'},
+ {id:'tk02',name:'TSR-8 蓋',cat:'日替わり容器',unit:'ケース',unitDetail:'2000入',note:''},
+ {id:'tk03',name:'TSR-10 黒 本体（ごはん大）',cat:'日替わり容器',unit:'ケース',unitDetail:'1200入',note:''},
+ {id:'tk04',name:'TSR-10 蓋',cat:'日替わり容器',unit:'ケース',unitDetail:'1200入',note:''},
+ {id:'tk05',name:'TSR-180 夢彩ごぜん 本体 黒（おかず身）',cat:'日替わり容器',unit:'ケース',unitDetail:'900入',note:'4ケース元払い・新作くん'},
+ {id:'tk06',name:'TSR-180 蓋 透明（おかず蓋）',cat:'日替わり容器',unit:'ケース',unitDetail:'900入',note:''},
+ {id:'tk07',name:'TSR-70-55-AJ2 夢彩ごぜん 本体 黒',cat:'日替わり容器',unit:'ケース',unitDetail:'800入',note:'旧ごはん屋黒容器'},
+ {id:'tk08',name:'TSR-70-55 蓋',cat:'日替わり容器',unit:'ケース',unitDetail:'800入',note:''},
+ {id:'tk09',name:'TSR-70-Ⅲ 夢彩ごぜん セット 柄付',cat:'別注容器',unit:'ケース',unitDetail:'1000入',note:'透明9マス折'},
+ {id:'tk10',name:'2004602 TSR-70Ⅲ 本体 柄',cat:'別注容器',unit:'ケース',unitDetail:'1000入',note:'身と蓋バラ発注可'},
+ {id:'tk11',name:'2004517 TSR-70 蓋 透明',cat:'別注容器',unit:'ケース',unitDetail:'1000入',note:''},
+ {id:'tk12',name:'TSR-BOX 70-70Ⅲ 中仕切り 柄付き9マス',cat:'別注容器',unit:'ケース',unitDetail:'300入',note:''},
+ {id:'tk13',name:'2003541 TSR-BOX80-55 中仕切Ⅰ柄',cat:'別注容器',unit:'ケース',unitDetail:'300入',note:'新弁当紙折仕切りセパレート'},
+ {id:'tk14',name:'2003539 TSR-BOX80-55 外箱 新和',cat:'別注容器',unit:'ケース',unitDetail:'300入',note:'1ケース元払い'},
+ {id:'tk15',name:'小鉢45 赤金',cat:'別注容器',unit:'ケース',unitDetail:'3000入',note:'1ケース元払い'},
+ {id:'tk16',name:'VIVIDケース 角特大 レタス柄',cat:'カップ・ケース',unit:'本',unitDetail:'',note:'10本以上元払い'},
+ {id:'tk17',name:'VIVIDケース 角特大 チェック赤',cat:'カップ・ケース',unit:'本',unitDetail:'',note:''},
+ {id:'tk18',name:'VIVIDケース 角特大 チェック緑',cat:'カップ・ケース',unit:'本',unitDetail:'',note:''},
+ {id:'tk19',name:'ミリオンOPP竹丸箸ブルー',cat:'消耗品',unit:'ケース',unitDetail:'',note:'日替り箸・5ケース元払い'},
+ {id:'tk20',name:'FGポリエチレングローブ外エンボス ブルー M',cat:'消耗品',unit:'箱',unitDetail:'',note:''},
+]},
+makino:{categories:['外売りパック','折重','外箱・仕切','丼・オードブル','カップ・小物','袋・紙袋','消耗品・衛生','カトラリー・シート','テープ','現在注文していない商品'],items:[
+ {id:'mk01',name:'FKパック P-200（外売り大パック）',cat:'外売りパック',unit:'個',unitDetail:'50入',note:'商品コード 0050005965'},
+ {id:'mk02',name:'KL-15-11B（N）（外売り中パック）',cat:'外売りパック',unit:'個',unitDetail:'1500入',note:'商品コード 0191920222'},
+ {id:'mk03',name:'KL-12-10B（N）（外売り小パック）',cat:'外売りパック',unit:'個',unitDetail:'50入',note:'商品コード 0191919601'},
+ {id:'mk04',name:'CTデリトップ18-13w 身（外売り白大パック）',cat:'外売りパック',unit:'個',unitDetail:'1200入',note:'商品コード 0010102951'},
+ {id:'mk05',name:'CTデリトップ18-13 フタ',cat:'外売りパック',unit:'個',unitDetail:'1200入',note:'商品コード 0010102952'},
+ {id:'mk06',name:'CTデリトップ15-11w 身（外売り白小パック）',cat:'外売りパック',unit:'個',unitDetail:'1800入',note:'商品コード 0010102949'},
+ {id:'mk07',name:'CTデリトップ15-11 フタ',cat:'外売りパック',unit:'個',unitDetail:'1800入',note:'商品コード 0010101870'},
+ {id:'mk08',name:'AP-OGIS エコ（1個入おにぎりパック 小）',cat:'外売りパック',unit:'個',unitDetail:'50入',note:'商品コード 0030304899'},
+ {id:'mk09',name:'SHN-3 白経木（サンドイッチ）',cat:'外売りパック',unit:'個',unitDetail:'50入',note:''},
+ {id:'mk10',name:'ネオクラフト ピザBOX L（ピザホール）',cat:'外売りパック',unit:'個',unitDetail:'10入',note:'商品コード 004248005'},
+ {id:'mk11',name:'EC10ファインクラフトシェル（ピザ＠38）',cat:'外売りパック',unit:'個',unitDetail:'400入',note:'商品コード 0010336992'},
+ {id:'mk12',name:'70-70 風月花',cat:'折重',unit:'ケース',unitDetail:'300入',note:'外箱フィルム付き'},
+ {id:'mk13',name:'70-70 C-1 黒',cat:'折重',unit:'ケース',unitDetail:'300入',note:'たんぽぽ・花めぐり・味ごよみ・バーグ'},
+ {id:'mk14',name:'70-70 C-4 黒',cat:'折重',unit:'ケース',unitDetail:'300入',note:'朝顔・ひまわり・まめ吉'},
+ {id:'mk15',name:'ワン折重67×51(40) 杉縁',cat:'折重',unit:'ケース',unitDetail:'400入',note:'静味・鷹狩・牛すき御膳'},
+ {id:'mk16',name:'ワン折重67×51Y 黒底',cat:'折重',unit:'ケース',unitDetail:'400入',note:''},
+ {id:'mk17',name:'ワン折重67×51 杉共蓋',cat:'折重',unit:'ケース',unitDetail:'400入',note:''},
+ {id:'mk18',name:'仕切板88×25 黒無地 仕切',cat:'折重',unit:'ケース',unitDetail:'400入',note:'静味'},
+ {id:'mk19',name:'ワン折重73×38(50) 杉縁',cat:'折重',unit:'ケース',unitDetail:'400入',note:'丼野郎・鰻とか'},
+ {id:'mk20',name:'ワン折重73×38K 高蓋',cat:'折重',unit:'ケース',unitDetail:'400入',note:''},
+ {id:'mk21',name:'ワン折重73×38A 赤底',cat:'折重',unit:'ケース',unitDetail:'400入',note:''},
+ {id:'mk22',name:'ワン折重81×55H 黒底',cat:'折重',unit:'ケース',unitDetail:'200入',note:'静味・商品コード 0340034168'},
+ {id:'mk23',name:'ワン折重81×55 杉共蓋',cat:'折重',unit:'ケース',unitDetail:'200入',note:'静味・鷹狩・商品コード 0340034111'},
+ {id:'mk24',name:'ワン折重81×55(45) 杉縁',cat:'折重',unit:'ケース',unitDetail:'200入',note:'商品コード 0340034109'},
+ {id:'mk25',name:'ワン折重90×60(50) 黒焼杉 縁',cat:'折重',unit:'ケース',unitDetail:'200入',note:'牛しぐれローストビーフ'},
+ {id:'mk26',name:'ワン折重90×60 黒焼杉縁 蓋',cat:'折重',unit:'ケース',unitDetail:'200入',note:''},
+ {id:'mk27',name:'ワン折重90×60 金底',cat:'折重',unit:'ケース',unitDetail:'200入',note:''},
+ {id:'mk28',name:'ワン折重HW-60K(45) 杉Ⅳ落蓋セット',cat:'折重',unit:'ケース',unitDetail:'120入',note:'イベリコ・紅鮭弁当'},
+ {id:'mk29',name:'CWH-2.5A 黒 たもん杉',cat:'折重',unit:'ケース',unitDetail:'300入',note:'ハンバーグ・チキン南蛮（本体蓋縁セット）'},
+ {id:'mk30',name:'WU-302 44 本体 本陣金',cat:'折重',unit:'ケース',unitDetail:'270入',note:'焼き鳥丼他'},
+ {id:'mk31',name:'T-WU-302-44 嵌合広蓋（ops）',cat:'折重',unit:'ケース',unitDetail:'540入',note:''},
+ {id:'mk32',name:'LB-K2/145 哥仙 共蓋付',cat:'折重',unit:'ケース',unitDetail:'120入',note:'二段重'},
+ {id:'mk33',name:'紙BOX65-65 おひとつ',cat:'外箱・仕切',unit:'ケース',unitDetail:'400入',note:'会議用弁当 外箱'},
+ {id:'mk34',name:'中仕切65-65 C-3 黒',cat:'外箱・仕切',unit:'ケース',unitDetail:'400入',note:'9マス'},
+ {id:'mk35',name:'CZ-220 BS黒本体（N）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:'いろは・めぐみ・牛しぐれ幕・お手軽・留置'},
+ {id:'mk36',name:'CZ-220 透明蓋（N）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:'お手軽・留置'},
+ {id:'mk37',name:'キョウゼン10B イチボク（外箱）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:'唐揚げ入り幕の内・納得幕の内'},
+ {id:'mk38',name:'キョウゼン10 ナカサラ1 黒（中仕切）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:''},
+ {id:'mk39',name:'キョウゼン10 ナカサラ1 黒（蓋）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:''},
+ {id:'mk40',name:'角折（小）用 十字仕切り',cat:'外箱・仕切',unit:'ケース',unitDetail:'280入',note:''},
+ {id:'mk41',name:'まめ吉 No.210 竹酔別注',cat:'外箱・仕切',unit:'ケース',unitDetail:'100入',note:'ホテル系 折 外箱'},
+ {id:'mk42',name:'SDビストロM 24-18仕切 BK 身',cat:'丼・オードブル',unit:'ケース',unitDetail:'450入',note:'カレー'},
+ {id:'mk43',name:'SDビストロM 24-18仕切 蓋',cat:'丼・オードブル',unit:'ケース',unitDetail:'450入',note:''},
+ {id:'mk44',name:'HD丼 185BZ 黒（どんぶり大）',cat:'丼・オードブル',unit:'ケース',unitDetail:'100入',note:'商品コード 0650066496'},
+ {id:'mk45',name:'HD丼 185OC 蓋',cat:'丼・オードブル',unit:'ケース',unitDetail:'100入',note:'商品コード 0650066497'},
+ {id:'mk46',name:'バイオDタカミ 180B 黒（どんぶり小）',cat:'丼・オードブル',unit:'ケース',unitDetail:'600入',note:'バラ（50枚）OK'},
+ {id:'mk47',name:'ハイックカータカミ 180 OCZ（蓋）',cat:'丼・オードブル',unit:'ケース',unitDetail:'600入',note:''},
+ {id:'mk48',name:'シェルトプラッター丸20 本体 金',cat:'丼・オードブル',unit:'ケース',unitDetail:'25入',note:'オードブル小（フルーツ盛）'},
+ {id:'mk49',name:'T-シェルトプラッター丸20 嵌合蓋',cat:'丼・オードブル',unit:'ケース',unitDetail:'25入',note:''},
+ {id:'mk50',name:'シェルトプラッター丸40 本体 金',cat:'丼・オードブル',unit:'ケース',unitDetail:'10入',note:'オードブル大'},
+ {id:'mk51',name:'T-シェルトプラッター丸40 嵌合蓋',cat:'丼・オードブル',unit:'ケース',unitDetail:'10入',note:''},
+ {id:'mk52',name:'KM60-60 本体 白',cat:'丼・オードブル',unit:'ケース',unitDetail:'2000入',note:'オードブル白カップ・まんぷくまるしぇ'},
+ {id:'mk53',name:'角トレー58P',cat:'丼・オードブル',unit:'ケース',unitDetail:'1125入',note:'オードブル透明トレー'},
+ {id:'mk54',name:'MSD古典-5 本体 黒',cat:'丼・オードブル',unit:'ケース',unitDetail:'300入',note:'商品コード 0030305847'},
+ {id:'mk55',name:'T-古典-5 嵌合蓋 OPS',cat:'丼・オードブル',unit:'ケース',unitDetail:'600入',note:'商品コード 0030004936'},
+ {id:'mk56',name:'COPカップ W40MB 本体（明太マヨカップ）',cat:'カップ・小物',unit:'個',unitDetail:'50入',note:''},
+ {id:'mk57',name:'COPカップ W60TC 嵌合蓋',cat:'カップ・小物',unit:'個',unitDetail:'50入',note:''},
+ {id:'mk58',name:'タレビン 角中（D）改（しおだれ）',cat:'カップ・小物',unit:'個',unitDetail:'100入',note:''},
+ {id:'mk59',name:'フィルムケース 5F 透明',cat:'カップ・小物',unit:'個',unitDetail:'500入',note:'商品コード 0260026901'},
+ {id:'mk60',name:'フィルムケース 雲龍 6号 白',cat:'カップ・小物',unit:'個',unitDetail:'500入',note:''},
+ {id:'mk61',name:'旬彩の器 雲龍（小）白',cat:'カップ・小物',unit:'個',unitDetail:'300入',note:''},
+ {id:'mk62',name:'バラン 豆山(1/2)型',cat:'カップ・小物',unit:'個',unitDetail:'',note:'商品コード 0480048011'},
+ {id:'mk63',name:'合掌ガゼット GTN No.23 バラ',cat:'カップ・小物',unit:'個',unitDetail:'100入',note:''},
+ {id:'mk64',name:'和紙タイ 4X120 クラフト',cat:'カップ・小物',unit:'個',unitDetail:'50入',note:'色：ホワイト・バイオレット・レッド・モスグリーン有'},
+ {id:'mk65',name:'OPP 250X378',cat:'袋・紙袋',unit:'枚',unitDetail:'1000入',note:'商品コード 0110011319'},
+ {id:'mk66',name:'OPP 230X230',cat:'袋・紙袋',unit:'枚',unitDetail:'1000入',note:'商品コード 0110011346'},
+ {id:'mk67',name:'HD片開きシート 015X350X450',cat:'袋・紙袋',unit:'枚',unitDetail:'600入',note:'商品コード 0090009016'},
+ {id:'mk68',name:'ばんじゅう用 内袋 No.105 ナチュラル',cat:'袋・紙袋',unit:'枚',unitDetail:'600入',note:''},
+ {id:'mk69',name:'規格袋 №11',cat:'袋・紙袋',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mk70',name:'規格袋 №15（紐付）',cat:'袋・紙袋',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mk71',name:'スムースバッグ 31-19 白無地（紙袋 小）',cat:'袋・紙袋',unit:'枚',unitDetail:'300入',note:''},
+ {id:'mk72',name:'手提袋 25CB 34-1 白無地（紙袋 中）',cat:'袋・紙袋',unit:'枚',unitDetail:'200入',note:''},
+ {id:'mk73',name:'HW-45（ジャンボ）片ツヤムジ（紙袋 大）',cat:'袋・紙袋',unit:'枚',unitDetail:'100入',note:''},
+ {id:'mk74',name:'フラットバッグ M かすみ草（葬儀 袋）',cat:'袋・紙袋',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mk75',name:'ピピ660 無地 パープル（風呂敷）',cat:'袋・紙袋',unit:'枚',unitDetail:'',note:''},
+ {id:'mk76',name:'弁当バック 特大 半透明（持ち帰り用ビニール）',cat:'袋・紙袋',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mk77',name:'ラミラプ30-35 未晒アミューズBR（唐揚げ中紙）',cat:'袋・紙袋',unit:'枚',unitDetail:'200入',note:'商品コード 004738226'},
+ {id:'mk78',name:'ヘイコー不織布おしぼり 平130X180',cat:'消耗品・衛生',unit:'本',unitDetail:'2500入',note:''},
+ {id:'mk79',name:'バイオハンドハイパー 3L',cat:'消耗品・衛生',unit:'本',unitDetail:'1000入',note:''},
+ {id:'mk80',name:'OPP袋入り楊枝',cat:'消耗品・衛生',unit:'本',unitDetail:'1000入',note:''},
+ {id:'mk81',name:'鉄砲串 9㎝ 250本入',cat:'消耗品・衛生',unit:'袋',unitDetail:'',note:''},
+ {id:'mk82',name:'クッキングペーパー 中',cat:'消耗品・衛生',unit:'個',unitDetail:'2入',note:''},
+ {id:'mk83',name:'中性洗剤ピアレスE 18㎏',cat:'消耗品・衛生',unit:'個',unitDetail:'',note:''},
+ {id:'mk84',name:'ストレッチポリZ ブルーSS',cat:'消耗品・衛生',unit:'枚',unitDetail:'4000入',note:''},
+ {id:'mk85',name:'ポリマラップ営業用 30cmX100m',cat:'消耗品・衛生',unit:'本',unitDetail:'',note:''},
+ {id:'mk86',name:'ポリマラップ営業用 45cmX100m',cat:'消耗品・衛生',unit:'本',unitDetail:'',note:''},
+ {id:'mk87',name:'フォーク140 単袋入（カレースプーン）',cat:'カトラリー・シート',unit:'本',unitDetail:'100入',note:''},
+ {id:'mk88',name:'スプーン160 単袋入（デザートスプーン）',cat:'カトラリー・シート',unit:'本',unitDetail:'100入',note:'商品コード 0010101641'},
+ {id:'mk89',name:'角丸スプーン P89N 10本カット',cat:'カトラリー・シート',unit:'本',unitDetail:'1000入',note:''},
+ {id:'mk90',name:'グルメシート パセリトマト・丸',cat:'カトラリー・シート',unit:'袋',unitDetail:'',note:''},
+ {id:'mk91',name:'グルメシート 大葉・丸',cat:'カトラリー・シート',unit:'袋',unitDetail:'',note:''},
+ {id:'mk92',name:'グルメシート グリーンリーフS・丸小',cat:'カトラリー・シート',unit:'袋',unitDetail:'',note:'大の1/2'},
+ {id:'mk93',name:'グルメシート 三枚笹・丸',cat:'カトラリー・シート',unit:'袋',unitDetail:'',note:''},
+ {id:'mk94',name:'グルメシート 熊笹・ヌキ',cat:'カトラリー・シート',unit:'袋',unitDetail:'',note:''},
+ {id:'mk95',name:'スワン手切れOPPテープ 赤 18X35',cat:'テープ',unit:'個',unitDetail:'10入',note:''},
+ {id:'mk96',name:'ニチバン セロテープ430 青 18X35',cat:'テープ',unit:'個',unitDetail:'10入',note:''},
+ {id:'mn01',name:'バイオハンドハイパー 弁当用 特大',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mn02',name:'竹酔 8寸角切 自動セット',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mn03',name:'白無地 8寸角切 自動セット',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mn04',name:'紙コップ ヘイコーペーパーカップ E7(WH)',cat:'現在注文していない商品',unit:'個',unitDetail:'100入',note:''},
+ {id:'mn05',name:'グルメシート 青もみじ・丸',cat:'現在注文していない商品',unit:'袋',unitDetail:'',note:''},
+ {id:'mn06',name:'グルメシート 梅・丸',cat:'現在注文していない商品',unit:'袋',unitDetail:'',note:''},
+ {id:'mn07',name:'グルメシート 桜・丸',cat:'現在注文していない商品',unit:'袋',unitDetail:'',note:''},
+ {id:'mn08',name:'グルメシート 桃・丸',cat:'現在注文していない商品',unit:'袋',unitDetail:'',note:''},
+ {id:'mn09',name:'AP-丸78-300LS エコ（唐揚げ単品）',cat:'現在注文していない商品',unit:'個',unitDetail:'1000入',note:''},
+ {id:'mn10',name:'T-AP-丸78ドーム蓋 エコ',cat:'現在注文していない商品',unit:'個',unitDetail:'2000入',note:''},
+ {id:'mn11',name:'AP-OG1 エコ（1個入おにぎりパック 大）',cat:'現在注文していない商品',unit:'個',unitDetail:'50入',note:''},
+ {id:'mn12',name:'フィルムケース 6F パステルムラサキ',cat:'現在注文していない商品',unit:'個',unitDetail:'',note:''},
+ {id:'mn13',name:'フィルムケース 6F 透明',cat:'現在注文していない商品',unit:'個',unitDetail:'',note:'在庫かかえてない'},
+ {id:'mn14',name:'バラン 山形1号（大）',cat:'現在注文していない商品',unit:'個',unitDetail:'',note:''},
+ {id:'mn15',name:'バンバンバッグ No.5 波',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mn16',name:'OPP 230X290',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
+ {id:'mn17',name:'M402 マフィンカップ 茶無地 59X50',cat:'現在注文していない商品',unit:'個',unitDetail:'100入',note:''},
+ {id:'mn18',name:'CU-235 青秀 本体（N）',cat:'現在注文していない商品',unit:'ケース',unitDetail:'200入',note:'相撲'},
+ {id:'mn19',name:'CU-235 青秀 共蓋',cat:'現在注文していない商品',unit:'ケース',unitDetail:'200入',note:''},
+ {id:'mn20',name:'CTいろは 23-17L BK 身',cat:'現在注文していない商品',unit:'ケース',unitDetail:'800入',note:'唐揚げ・ハンバーグ'},
+ {id:'mn21',name:'CTいろは 23-17 T高蓋',cat:'現在注文していない商品',unit:'ケース',unitDetail:'800入',note:''},
+ {id:'mn22',name:'ワン折重81×55Y 黒底',cat:'現在注文していない商品',unit:'ケース',unitDetail:'200入',note:'鷹狩・バラ売り料金発生・牧野で在庫を抱えてくれるが最後まで使い切る'},
+ {id:'mn23',name:'JY70-70-D 黒',cat:'現在注文していない商品',unit:'ケース',unitDetail:'600入',note:'駿河御膳'},
+ {id:'mn24',name:'ワン折重70×37(48) 黒焼杉 縁',cat:'現在注文していない商品',unit:'ケース',unitDetail:'400入',note:'牛しぐれ重・味くらべ重・助六'},
+ {id:'mn25',name:'ワン折重70×37-K7 透明蓋',cat:'現在注文していない商品',unit:'ケース',unitDetail:'400入',note:''},
+ {id:'mn26',name:'ワン折重PH70×37B-43 金底',cat:'現在注文していない商品',unit:'ケース',unitDetail:'400入',note:''},
+]},
+origami:{categories:['懐石容器','外箱'],items:[
+ {id:'or01',name:'KC長手懐石 黒木目2',cat:'懐石容器',unit:'ケース',unitDetail:'200入',note:'大御所'},
+ {id:'or02',name:'杉F7 192×192 角丸',cat:'外箱',unit:'枚',unitDetail:'20入',note:'復刻幕の内の外箱・通常10注文'},
+]},
+sangyo:{categories:['容器','手袋・衛生用品','消耗品'],items:[
+ {id:'sa01',name:'MSDアコード23-17-1 黒',cat:'容器',unit:'ケース',unitDetail:'800枚入',note:'唐揚げ弁当／納品場所：おりべや⑤'},
+ {id:'sa02',name:'T-アコード23-17 嵌合蓋',cat:'容器',unit:'ケース',unitDetail:'800枚入',note:''},
+ {id:'sa03',name:'プラスト CP78-300',cat:'容器',unit:'ケース',unitDetail:'1000枚入',note:'唐揚げ単品'},
+ {id:'sa04',name:'CP78-Fドーム フタ アナナシ',cat:'容器',unit:'ケース',unitDetail:'2000枚入',note:''},
+ {id:'sa05',name:'711356 ニトリルリベロ ブルー S（587パウダーフリー）',cat:'手袋・衛生用品',unit:'ケース',unitDetail:'',note:'2ケース元払い（800円）'},
+ {id:'sa06',name:'711357 ニトリルリベロ ブルー M（588パウダーフリー）',cat:'手袋・衛生用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'sa07',name:'711358 ニトリルリベロ ブルー L（589パウダーフリー）',cat:'手袋・衛生用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'sa08',name:'タウパースノークM（手拭きペーパー）',cat:'手袋・衛生用品',unit:'ケース',unitDetail:'35袋入',note:'納品場所：⑲ ※R6.11.19〜サンワから変更'},
+ {id:'sa09',name:'Jリーフレタス小',cat:'消耗品',unit:'ケース',unitDetail:'1000入',note:'盛付台 下の棚'},
+ {id:'sa10',name:'Jバラン抗菌 青山1号（山型1号）',cat:'消耗品',unit:'ケース',unitDetail:'1000枚入',note:'盛付台 下の棚'},
+ {id:'sa11',name:'業務用再生紙 芯なし6R',cat:'消耗品',unit:'袋',unitDetail:'',note:'事務所／基本はケース単位・特別に1袋単位OK'},
+ {id:'sa12',name:'粘着ローラー SUN69',cat:'消耗品',unit:'本',unitDetail:'',note:'1本単位OK'},
+]},
+azumi:{categories:['容器','おしぼり・カップ'],items:[
+ {id:'az01',name:'T-70-55-3 柄',cat:'容器',unit:'ケース',unitDetail:'900入',note:'トリム・ヘルシー'},
+ {id:'az02',name:'T-70-55-2 蓋',cat:'容器',unit:'ケース',unitDetail:'900入',note:''},
+ {id:'az03',name:'8K003 8寸おしぼり 藤化粧3点セット',cat:'おしぼり・カップ',unit:'ケース',unitDetail:'250入',note:'4ケース元払い・税抜1200円以上の弁当に使う・2日くらいで届く（バラは1ケース¥1000）'},
+ {id:'az04',name:'8ME03 クッキングシート 33㎜×30㎜',cat:'おしぼり・カップ',unit:'ケース',unitDetail:'',note:'1ケース元払い'},
+ {id:'az05',name:'KCカップ KC70-B 八角（97-97）金',cat:'おしぼり・カップ',unit:'本',unitDetail:'100枚/本',note:'混載で200本にする・一番使うのは八角（20本元払い）'},
+ {id:'az06',name:'KCカップ KC70-D 四ッ仕切（97-97）金',cat:'おしぼり・カップ',unit:'本',unitDetail:'100枚/本',note:''},
+ {id:'az07',name:'KCカップ KC70-E 横一本仕切（97-97）金',cat:'おしぼり・カップ',unit:'本',unitDetail:'100枚/本',note:''},
+ {id:'az08',name:'FINE CUP ピンク 6号',cat:'おしぼり・カップ',unit:'本',unitDetail:'500入/本',note:'60本元払い・札の使用割合メモを見て頼む（例：ピンク7 紫3→ピンク40本・紫20本）'},
+ {id:'az09',name:'FINE CUP パープル 6号',cat:'おしぼり・カップ',unit:'本',unitDetail:'500入/本',note:''},
+ {id:'az10',name:'FINE CUP イエロー 6号',cat:'おしぼり・カップ',unit:'本',unitDetail:'500入/本',note:''},
+]},
+shinmura:{categories:['洗剤・調理用品','消耗品','調理器具'],items:[
+ {id:'sm01',name:'ジアソー',cat:'洗剤・調理用品',unit:'箱',unitDetail:'',note:'日替の折部屋か洗剤置き場に／カラ容器有るか確認する'},
+ {id:'sm02',name:'食用スプレー ソフトンSA',cat:'洗剤・調理用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'sm03',name:'ラショナル 固形洗剤 アクティブグリーン',cat:'洗剤・調理用品',unit:'ケース',unitDetail:'',note:'2箱以上で送料無料（送料¥1650）・15:00まで注文で翌日出荷'},
+ {id:'sm04',name:'ラショナル 固形ケア剤',cat:'洗剤・調理用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'sm05',name:'シグマチューブ GH-2030（真空調理袋 大）',cat:'消耗品',unit:'袋',unitDetail:'100枚入',note:'10ずつ'},
+ {id:'sm06',name:'シグマチューブ GH-1323',cat:'消耗品',unit:'袋',unitDetail:'100枚入',note:'10ずつ'},
+ {id:'sm07',name:'真空ポンプ用純正オイル 2L',cat:'消耗品',unit:'本',unitDetail:'',note:'2L/400cc'},
+ {id:'sm08',name:'松葉串 8㎝ 101本入',cat:'消耗品',unit:'袋',unitDetail:'',note:''},
+ {id:'sm09',name:'プロシェフ 18-8ガストロノームパン1/1 150㎜',cat:'調理器具',unit:'枚',unitDetail:'',note:'鉄板'},
+ {id:'sm10',name:'18-8プロ角型フライヤー 中',cat:'調理器具',unit:'個',unitDetail:'',note:'@1680税込'},
+]},
+shingi:{categories:['仕切り・容器','消耗品'],items:[
+ {id:'sg01',name:'6.5-3黒 185×185×30H（駿河仕切）',cat:'仕切り・容器',unit:'ケース',unitDetail:'',note:'4ケース以上で送料無料'},
+ {id:'sg02',name:'70-70 二段会席',cat:'仕切り・容器',unit:'ケース',unitDetail:'',note:''},
+ {id:'sg03',name:'70-70 風月花（セパレート）',cat:'仕切り・容器',unit:'ケース',unitDetail:'',note:'普段は牧野'},
+ {id:'sg04',name:'70-70 C-4',cat:'仕切り・容器',unit:'ケース',unitDetail:'',note:'普段は牧野'},
+ {id:'sg05',name:'65-65 C-3 黒',cat:'仕切り・容器',unit:'ケース',unitDetail:'',note:'普段は牧野'},
+ {id:'sg06',name:'L-6.5（復刻幕の内仕切り）',cat:'仕切り・容器',unit:'ケース',unitDetail:'2400枚/ケース',note:''},
+ {id:'sg07',name:'MSDランチ70 本体 黒',cat:'仕切り・容器',unit:'ケース',unitDetail:'600入',note:'1c/sからOK・急ぎだと送料かかる場合有（急ぎでないならその旨伝える）'},
+ {id:'sg08',name:'T-ランチ70 内嵌合高蓋',cat:'仕切り・容器',unit:'ケース',unitDetail:'',note:''},
+ {id:'sg09',name:'EAIFIX食品添加物 20L',cat:'消耗品',unit:'缶',unitDetail:'',note:''},
+ {id:'sg10',name:'四季彩ゴム結 日和',cat:'消耗品',unit:'袋',unitDetail:'2000本入',note:'2000本単位・納期7〜14日'},
+]},
+sanwa:{categories:['衛生用品','折'],items:[
+ {id:'sw01',name:'タウパースノーク M（手拭きペーパー）',cat:'衛生用品',unit:'ケース',unitDetail:'200枚×35パック',note:'納品場所：⑲ ※R6.11.19〜静岡産業社に変更'},
+ {id:'sw02',name:'ニトリルライト粉無ブルー 854 S',cat:'衛生用品',unit:'ケース',unitDetail:'',note:'納品場所：おりべや⑤ 入口すぐ右'},
+ {id:'sw03',name:'ニトリルライト粉無ブルー 854 M',cat:'衛生用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'sw04',name:'ニトリルライト粉無ブルー 854 L',cat:'衛生用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'sw05',name:'150角二段折 杉木目（シャクリ蓋）',cat:'折',unit:'ケース',unitDetail:'96枚入',note:'ピンク二段／納品場所：おりべや⑤'},
+]},
+fuji:{categories:['原料'],items:[
+ {id:'fj01',name:'ホワイトF2 16kg缶',cat:'原料',unit:'缶',unitDetail:'',note:'送料1,300円かかる'},
+]},
+okawara:{categories:['ダンボール'],items:[
+ {id:'ok01',name:'ダンボール №1〈名無し〉',cat:'ダンボール',unit:'枚',unitDetail:'',note:'300枚単位で頼む'},
+ {id:'ok02',name:'ダンボール HT-5〈名無し〉',cat:'ダンボール',unit:'枚',unitDetail:'',note:'細長い'},
+]},
+chemical:{categories:['洗剤・衛生用品'],items:[
+ {id:'ch01',name:'ケミクール',cat:'洗剤・衛生用品',unit:'ケース',unitDetail:'4本入',note:''},
+ {id:'ch02',name:'マイスターシャインNR',cat:'洗剤・衛生用品',unit:'ケース',unitDetail:'',note:''},
+ {id:'ch03',name:'ニイタカ 薬用ハンドソープ 5kg',cat:'洗剤・衛生用品',unit:'ケース',unitDetail:'',note:''},
+]},
+bigmore:{categories:['ユニフォーム','帽子・エプロン','シューズ・長靴'],items:[
+ {id:'bg01',name:'半袖ブルゾン',cat:'ユニフォーム',unit:'着',unitDetail:'',note:'',sizes:['S','M','L','LL']},
+ {id:'bg02',name:'パンツ（7-541）',cat:'ユニフォーム',unit:'着',unitDetail:'',note:'',sizes:['S','M','L','LL','3L']},
+ {id:'bg03',name:'白衣 開襟 長袖',cat:'ユニフォーム',unit:'着',unitDetail:'',note:'',sizes:['M']},
+ {id:'bg04',name:'白衣 開襟 半袖',cat:'ユニフォーム',unit:'着',unitDetail:'',note:'',sizes:['S']},
+ {id:'bg05',name:'ウレタン 胸前掛（白）90-120㎝',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:''},
+ {id:'bg06',name:'ウレタン 胸前掛（白）90-110㎝',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:''},
+ {id:'bg07',name:'丸天フード F',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:''},
+ {id:'bg08',name:'帽子ネット',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:'',sizes:['M','L']},
+ {id:'bg09',name:'八角帽子 たれ付',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:'',sizes:['M','L']},
+ {id:'bg10',name:'EVAエプロン ブルー',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:''},
+ {id:'bg11',name:'9-1056-L 頭巾帽子 ブルー',cat:'帽子・エプロン',unit:'枚',unitDetail:'',note:''},
+ {id:'bg12',name:'厨房シューズ',cat:'シューズ・長靴',unit:'足',unitDetail:'',note:'黒有り→注文の際は「黒で」と書く',sizes:['22.5','23','23.5','24','24.5','25','25.5','26','26.5','27','28']},
+ {id:'bg13',name:'長靴',cat:'シューズ・長靴',unit:'足',unitDetail:'',note:'',sizes:['23','23.5','24','24.5','25','25.5','26','26.5','27','28']},
+]},
+tsukamoto:{categories:['印刷物'],items:[
+ {id:'tp01',name:'しずおか絵巻物語（弁当蓋）',cat:'印刷物',unit:'枚',unitDetail:'',note:'メール発注可（担当：高橋様）・通常5000枚'},
+]},
+karaage:{categories:['カップ・シール','その他'],items:[
+ {id:'ka01',name:'金賞からあげカップ（作成）',cat:'カップ・シール',unit:'個',unitDetail:'',note:'通常3000個作成'},
+ {id:'ka02',name:'大御所唐揚げカップ（作成）',cat:'カップ・シール',unit:'個',unitDetail:'',note:'通常1000個作成'},
+ {id:'ka03',name:'成分表示シール 金賞カラアゲ',cat:'カップ・シール',unit:'シート',unitDetail:'1シート44枚',note:''},
+ {id:'ka04',name:'成分表示シール 大御所カラアゲ',cat:'カップ・シール',unit:'シート',unitDetail:'1シート44枚',note:''},
+ {id:'ka05',name:'〇シール 金賞唐揚げ',cat:'カップ・シール',unit:'シート',unitDetail:'1シート20枚',note:''},
+ {id:'ka06',name:'〇シール 大御所唐揚げ',cat:'カップ・シール',unit:'シート',unitDetail:'1シート20枚',note:''},
+ {id:'ka07',name:'カップ',cat:'カップ・シール',unit:'ケース',unitDetail:'1ケース1000入り',note:'通常4ケース'},
+ {id:'ka08',name:'赤テープ',cat:'その他',unit:'本',unitDetail:'',note:'通常4本'},
+ {id:'ka09',name:'つまようじ',cat:'その他',unit:'ケース',unitDetail:'1000本/ケース',note:'通常4ケース（4000本）'},
+ {id:'ka10',name:'わさび塩',cat:'その他',unit:'個',unitDetail:'',note:'消費期限を確認'},
+ {id:'ka11',name:'油取り紙',cat:'その他',unit:'枚',unitDetail:'',note:'通常4005枚（予備含む・盛付で用意）'},
+]},
+};
+
+// ============================================================
+// 状態管理・localStorage（v2 / v1から自動移行）
+// ============================================================
+const KEY_V2='chikusui_order_app_v2', KEY_V1='chikusui_order_app_v1';
+let items = JSON.parse(JSON.stringify(baseItems));
+let historyData = [];
+let cart = [];
+let tantouOverrides = {}; // 発注担当者の変更を記憶 {supplierId: 名前}
+let editingOrders = {};   // 再発行編集中の発注 {supplierId: 履歴ID}
+function getTantou(s){ return tantouOverrides[s.id] || s.tantou; }
+
+function saveState(){
+  try{
+    localStorage.setItem(KEY_V2, JSON.stringify({cart, historyData, items, tantouOverrides, editingOrders, masterVersion:2, savedAt:new Date().toISOString()}));
+  }catch(e){ console.warn('保存失敗', e); }
+}
+(function loadState(){
+  try{
+    const raw2 = localStorage.getItem(KEY_V2);
+    if(raw2){
+      const s = JSON.parse(raw2);
+      if(Array.isArray(s.cart)) cart = s.cart;
+      if(Array.isArray(s.historyData)) historyData = s.historyData;
+      if(s.tantouOverrides) tantouOverrides = s.tantouOverrides;
+      if(s.editingOrders) editingOrders = s.editingOrders;
+      if(s.masterVersion===2 && s.items){
+        items = s.items;            // 現行版：編集・削除をそのまま復元
+      }else if(s.items){
+        mergeUserItems(s.items);    // 旧構造：ユーザー追加分だけ合流
+        saveState();
+      }
+      return;
+    }
+    // v1 からの移行：カート・履歴を引き継ぎ、ユーザー追加品目もマージ
+    const raw1 = localStorage.getItem(KEY_V1);
+    if(raw1){
+      const s = JSON.parse(raw1);
+      if(Array.isArray(s.historyData)) historyData = s.historyData;
+      if(Array.isArray(s.cart)) cart = s.cart;
+      if(s.items) mergeUserItems(s.items);
+      saveState();
+    }
+  }catch(e){ console.warn('読込失敗', e); }
+})();
+// 旧データのうち「ユーザーが画面から追加した品目」だけを新マスターに合流させる
+// 旧版の追加品目ID：発注先ID-xxxx（例 takagi-lx3f2a）／新版：u+数字
+function mergeUserItems(saved){
+  Object.keys(saved).forEach(supId=>{
+    const grp = saved[supId];
+    if(!grp || !Array.isArray(grp.items)) return;
+    if(!items[supId]) items[supId]={categories:[],items:[]};
+    grp.items.forEach(it=>{
+      const isUserAdded = /-/.test(String(it.id)) || /^u\d/.test(String(it.id));
+      if(!isUserAdded) return;
+      if(items[supId].items.some(x=>x.name===it.name)) return; // 同名は新マスター優先
+      items[supId].items.push(it);
+      if(it.cat && !items[supId].categories.includes(it.cat)) items[supId].categories.push(it.cat);
+    });
+  });
+}
+
+// ============================================================
+// ユーティリティ
+// ============================================================
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function supById(id){ return suppliers.find(s=>s.id===id); }
+function todayStr(){ const d=new Date(); return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; }
+function jpDate(){ const d=new Date(); const w='日月火水木金土'[d.getDay()]; return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${w}）`; }
+
+// 前回発注情報（発注先＋品名＋サイズで履歴を新しい順に検索）
+function prevOrder(supName, itemName, size){
+  for(const h of historyData){
+    if(h.supplier !== supName) continue;
+    const f = h.items.find(i=>i.name===itemName && (i.size||'')===(size||''));
+    if(f) return {qty:f.qty, unit:f.unit, date:h.date};
+  }
+  return null;
+}
+
+// ============================================================
+// タブ
+// ============================================================
+let currentSupplier = null;
+let currentCategory = 'all';
+
+function showTab(name){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('tabBtn-'+name).classList.add('active');
+  if(name==='cart') renderCart();
+  if(name==='history') renderHistory();
+  updateCartBar();
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// 発注先チップ・品目リスト
+// ============================================================
+function renderSuppliers(){
+  const inCartSup = new Set(cart.map(c=>c.supplierId));
+  document.getElementById('supplierChips').innerHTML = suppliers.map(s=>{
+    const n = items[s.id] ? items[s.id].items.length : 0;
+    return `<button class="chip ${currentSupplier===s.id?'active':''} ${inCartSup.has(s.id)?'incart':''}" onclick="selectSupplier('${s.id}')">${esc(s.name)}<span class="n">${n}</span></button>`;
+  }).join('');
+}
+function selectSupplier(id){
+  currentSupplier = (currentSupplier===id) ? null : id;
+  currentCategory = 'all';
+  document.getElementById('searchInput').value='';
+  renderSuppliers(); renderItems();
+}
+function selectCategory(c){ currentCategory=c; renderItems(); }
+function onSearch(){ renderItems(); }
+
+function qtyInCart(supplierId,itemId,size){
+  const f = cart.find(c=>c.supplierId===supplierId && c.itemId===itemId && (c.size||'')===(size||''));
+  return f ? f.qty : 0;
+}
+
+function itemRowHtml(it, sup, showSup){
+  const hasSizes = Array.isArray(it.sizes) && it.sizes.length>0;
+  const sizeSel = hasSizes ? `<select class="size-select" id="size-${it.id}" onchange="renderOneQty('${sup.id}','${it.id}')">${it.sizes.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select>` : '';
+  const size0 = hasSizes ? it.sizes[0] : '';
+  const q = qtyInCart(sup.id, it.id, size0);
+  const pv = prevOrder(sup.name, it.name, size0);
+  const dim = it.cat==='現在注文していない商品' ? 'dim' : '';
+  return `<div class="item-row ${dim}" id="row-${it.id}">
+    <div class="item-main">
+      <div class="item-name">${esc(it.name)}</div>
+      <div class="item-tags">
+        ${showSup?`<span class="tag-sup">${esc(sup.name)}</span>`:''}
+        <span class="tag-unit">${esc(it.unit)}${it.unitDetail?'・'+esc(it.unitDetail):''}</span>
+      </div>
+      ${it.note?`<div class="item-note">${esc(it.note)}</div>`:''}
+      <div id="prev-${it.id}">${pv?`<span class="item-prev">前回 ${pv.qty}${esc(pv.unit)}（${esc(pv.date)}）</span>`:''}</div>
+    </div>
+    <div class="item-edit-btns">
+      <button class="mini-btn" title="編集" onclick="openItemModal('${sup.id}','${it.id}')">✎</button>
+      <button class="mini-btn" title="削除" onclick="deleteItem('${sup.id}','${it.id}')">🗑</button>
+    </div>
+    <div class="item-ctrl">
+      ${sizeSel}
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="qty-box ${q>0?'has':''}" id="qb-${it.id}">
+          <button onclick="stepQty('${sup.id}','${it.id}',-1)">−</button>
+          <input type="number" min="0" inputmode="numeric" id="qty-${it.id}" value="${q>0?q:''}" placeholder="0" onchange="setQtyFromInput('${sup.id}','${it.id}')">
+          <button onclick="stepQty('${sup.id}','${it.id}',1)">＋</button>
+        </div>
+        <span class="qty-unit">${esc(it.unit)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderItems(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const listEl = document.getElementById('itemsList');
+  const infoEl = document.getElementById('supplierInfo');
+  const catEl = document.getElementById('categoryTabs');
+  const headEl = document.getElementById('itemsHead');
+
+  // ---- 全発注先横断検索 ----
+  if(q){
+    infoEl.classList.remove('show'); catEl.style.display='none'; headEl.style.display='none';
+    let html='', hit=0;
+    suppliers.forEach(s=>{
+      const g = items[s.id]; if(!g) return;
+      g.items.forEach(it=>{
+        if((it.name+' '+(it.note||'')+' '+(it.cat||'')).toLowerCase().includes(q)){
+          html += itemRowHtml(it, s, true); hit++;
+        }
+      });
+    });
+    listEl.innerHTML = hit ? `<div class="search-hint">「${esc(q)}」の検索結果：${hit}件</div>`+html
+      : `<div class="no-items">「${esc(q)}」に一致する品目はありません</div>`;
+    return;
+  }
+
+  // ---- 発注先未選択 ----
+  if(!currentSupplier){
+    infoEl.classList.remove('show'); catEl.style.display='none'; headEl.style.display='none';
+    listEl.innerHTML = `<div class="no-items">上の発注先を選ぶか、品名で検索してください</div>`;
+    return;
+  }
+
+  const sup = supById(currentSupplier);
+  if(!items[currentSupplier]) items[currentSupplier]={categories:[],items:[]};
+  const data = items[currentSupplier];
+
+  infoEl.classList.add('show');
+  infoEl.innerHTML = `<b>${esc(sup.name)}</b><span class="fx">FAX ${esc(sup.fax)}／担当 ${esc(sup.tantou)}</span>${sup.note?`<div class="nt">※${esc(sup.note)}</div>`:''}`;
+
+  catEl.style.display='flex';
+  catEl.innerHTML = `<button class="cat-btn ${currentCategory==='all'?'active':''}" onclick="selectCategory('all')">すべて</button>`
+    + data.categories.map(c=>`<button class="cat-btn ${currentCategory===c?'active':''} ${c==='現在注文していない商品'?'notorder':''}" onclick="selectCategory('${esc(c)}')">${esc(c)}</button>`).join('');
+
+  headEl.style.display='flex';
+  document.getElementById('itemsTitle').textContent = `${sup.name} の品目`;
+
+  let filtered = currentCategory==='all' ? data.items : data.items.filter(i=>i.cat===currentCategory);
+  // 「すべて」表示のときは注文していない商品は末尾へ
+  if(currentCategory==='all'){
+    filtered = [...filtered.filter(i=>i.cat!=='現在注文していない商品'), ...filtered.filter(i=>i.cat==='現在注文していない商品')];
+  }
+  listEl.innerHTML = filtered.length ? filtered.map(it=>itemRowHtml(it,sup,false)).join('')
+    : `<div class="no-items">品目がありません。「＋ 品目を追加」から登録できます</div>`;
+}
+
+// 数量操作 → 即カート反映
+function currentSize(itemId){
+  const el = document.getElementById('size-'+itemId);
+  return el ? el.value : '';
+}
+function stepQty(supplierId,itemId,delta){
+  const input = document.getElementById('qty-'+itemId);
+  let v = parseInt(input.value)||0;
+  v = Math.max(0, v+delta);
+  input.value = v>0 ? v : '';
+  applyQty(supplierId,itemId,v);
+}
+function setQtyFromInput(supplierId,itemId){
+  const input = document.getElementById('qty-'+itemId);
+  let v = parseInt(input.value)||0;
+  if(v<0) v=0;
+  input.value = v>0 ? v : '';
+  applyQty(supplierId,itemId,v);
+}
+function applyQty(supplierId,itemId,qty){
+  const size = currentSize(itemId);
+  const it = items[supplierId].items.find(i=>i.id===itemId);
+  const idx = cart.findIndex(c=>c.supplierId===supplierId && c.itemId===itemId && (c.size||'')===(size||''));
+  if(qty>0){
+    if(idx>=0) cart[idx].qty = qty;
+    else cart.push({supplierId, itemId, name:it.name, qty, unit:it.unit, size:size||''});
+  }else if(idx>=0){
+    cart.splice(idx,1);
+    if(!cart.some(c=>c.supplierId===supplierId)) delete editingOrders[supplierId];
+  }
+  const qb=document.getElementById('qb-'+itemId);
+  if(qb) qb.classList.toggle('has', qty>0);
+  saveState(); updateCartBar(); renderSuppliers();
+}
+// サイズ切替時に数量欄をそのサイズのカート数量に更新
+function renderOneQty(supplierId,itemId){
+  const size = currentSize(itemId);
+  const q = qtyInCart(supplierId,itemId,size);
+  const input = document.getElementById('qty-'+itemId);
+  input.value = q>0 ? q : '';
+  document.getElementById('qb-'+itemId).classList.toggle('has', q>0);
+  const sup = supById(supplierId);
+  const it = items[supplierId].items.find(i=>i.id===itemId);
+  const pv = prevOrder(sup.name, it.name, size);
+  document.getElementById('prev-'+itemId).innerHTML = pv?`<span class="item-prev">前回 ${pv.qty}${esc(pv.unit)}（${esc(pv.date)}）</span>`:'';
+}
+
+// ============================================================
+// カート
+// ============================================================
+function updateCartBar(){
+  const badge = document.getElementById('cartBadge');
+  const bar = document.getElementById('cartBar');
+  const n = cart.length;
+  badge.style.display = n?'':'none';
+  badge.textContent = n;
+  const supN = new Set(cart.map(c=>c.supplierId)).size;
+  document.getElementById('cartBarCount').textContent = n;
+  document.getElementById('cartBarSup').textContent = supN;
+  const onOrderTab = document.getElementById('page-order').classList.contains('active');
+  bar.classList.toggle('show', n>0 && onOrderTab && window.innerWidth<=720);
+}
+window.addEventListener('resize', updateCartBar);
+
+function cartGroups(){
+  const g = {};
+  cart.forEach(c=>{ (g[c.supplierId] ||= []).push(c); });
+  return g;
+}
+function renderCart(){
+  const el = document.getElementById('cartList');
+  const actions = document.getElementById('cartActions');
+  if(!cart.length){
+    el.innerHTML = `<div class="no-items">カートは空です。<br>「発注作成」タブで数量を入力すると自動で追加されます</div>`;
+    actions.style.display='none'; return;
+  }
+  actions.style.display='flex';
+  const groups = cartGroups();
+  el.innerHTML = Object.keys(groups).map(supId=>{
+    const s = supById(supId);
+    return `<div class="cart-group">
+      <div class="cart-group-head"><span>${esc(s.name)}${editingOrders[supId]?` <span class="reissue">再発行編集中</span>`:''}</span><span class="fx">FAX ${esc(s.fax)}</span></div>
+      ${groups[supId].map(c=>{
+        const key = `${c.supplierId}|${c.itemId}|${c.size||''}`;
+        return `<div class="cart-line">
+          <div class="nm">${esc(c.name)}${c.size?` <span class="sz">［${esc(c.size)}］</span>`:''}
+            <input class="cart-note-input" placeholder="備考（発注書の備考欄に印刷されます）" value="${esc(c.note||'')}" onchange="cartSetNote('${key}',this.value)">
+          </div>
+          <div class="qty-box has">
+            <button onclick="cartStep('${key}',-1)">−</button>
+            <input type="number" min="1" inputmode="numeric" value="${c.qty}" onchange="cartSet('${key}',this.value)">
+            <button onclick="cartStep('${key}',1)">＋</button>
+          </div>
+          <span class="qty-unit">${esc(c.unit)}</span>
+          <button class="del" onclick="cartRemove('${key}')">✕</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+function findCartByKey(key){
+  const [supplierId,itemId,size] = key.split('|');
+  return cart.findIndex(c=>c.supplierId===supplierId && c.itemId===itemId && (c.size||'')===size);
+}
+function cartStep(key,delta){
+  const i = findCartByKey(key); if(i<0) return;
+  cart[i].qty = Math.max(1, cart[i].qty+delta);
+  saveState(); renderCart(); updateCartBar();
+}
+function cartSet(key,val){
+  const i = findCartByKey(key); if(i<0) return;
+  const v = parseInt(val)||1;
+  cart[i].qty = Math.max(1, v);
+  saveState(); renderCart(); updateCartBar();
+}
+function cartSetNote(key,val){
+  const i = findCartByKey(key); if(i<0) return;
+  cart[i].note = val.trim();
+  saveState();
+}
+function cartRemove(key){
+  const i = findCartByKey(key); if(i<0) return;
+  const supId = cart[i].supplierId;
+  cart.splice(i,1);
+  if(!cart.some(c=>c.supplierId===supId)) delete editingOrders[supId];
+  saveState(); renderCart(); updateCartBar(); renderSuppliers();
+}
+function clearCart(){
+  if(!confirm('カートを全てクリアしますか？')) return;
+  cart = []; editingOrders = {}; saveState(); renderCart(); updateCartBar(); renderSuppliers(); renderItems();
+}
+
+// ============================================================
+// 発注書（プレビュー・印刷共通）
+// ============================================================
+function orderSheetHtml(supId, lines, tantou, memo){
+  const s = supById(supId);
+  const tel = s.tel || COMPANY.telDefault;
+  const showFax = s.fax && s.fax !== '—';
+  const rows = lines.map(c=>`<tr>
+      <td>${esc(c.name)}${c.size?`　<b>サイズ：${esc(c.size)}</b>`:''}</td>
+      <td class="num">${c.qty}</td>
+      <td class="unit">${esc(c.unit)}</td>
+      <td class="nt">${esc(c.note||'')}</td>
+    </tr>`).join('');
+  const blank = `<tr class="ps-blank"><td></td><td class="num"></td><td class="unit"></td><td class="nt"></td></tr>`.repeat(2);
+  return `
+    <div class="ps-head">
+      <div>
+        <div class="ps-to">${esc(s.printName)}　御中</div>
+        ${showFax?`<div class="ps-tofax">FAX　${esc(s.fax)}</div>`:''}
+        ${s.printExtra?`<div class="ps-toextra">${esc(s.printExtra)}</div>`:''}
+      </div>
+      <div class="ps-from">
+        <div class="cn">${esc(COMPANY.name)}</div>
+        ${esc(COMPANY.addr)}<br>
+        TEL　${esc(tel)}<br>
+        FAX　${esc(COMPANY.fax)}<br>
+        発注担当　<span id="st-${supId}">${esc(tantou ?? getTantou(s))}</span>
+      </div>
+    </div>
+    <div class="ps-title">発注書</div>
+    <div class="ps-greet">以下の通り発注致しますので、宜しくお願い致します。${showFax?'<br>確認後、FAXをご返信下さい。':''}</div>
+    <div class="ps-dates"><span>発注日：${jpDate()}</span><span>納品日：　　　月　　　日（　　）</span></div>
+    <table class="ps-table">
+      <tr><th>品　名</th><th>数量</th><th>単位</th><th>備考</th></tr>
+      ${rows}${blank}
+    </table>
+    ${s.place?`<div class="ps-place">納入場所：${esc(s.place)}</div>`:''}
+    ${s.note?`<div class="ps-note">※ ${esc(s.note)}</div>`:''}
+    <div class="ps-memo" id="sm-${supId}" style="${memo?'':'display:none'}"><b>連絡事項：</b><span class="mv">${esc(memo||'')}</span></div>
+    <div class="ps-confirm"><div class="box"><div class="lbl">貴社確認欄</div><div class="sp"></div></div></div>`;
+}
+
+function showPreview(){
+  if(!cart.length) return;
+  const groups = cartGroups();
+  document.getElementById('previewBody').innerHTML =
+    `<div class="search-hint" style="margin-bottom:10px">${Object.keys(groups).length}社分の発注書を作成します（発注先ごとに1枚ずつ印刷されます）</div>`
+    + Object.keys(groups).map(supId=>{
+      const s = supById(supId);
+      const editH = editingOrders[supId] ? historyData.find(x=>x.id===editingOrders[supId]) : null;
+      const memo0 = editH ? (editH.memo||'') : '';
+      const tantou0 = editH && editH.tantou ? editH.tantou : getTantou(s);
+      return `${editH?`<div class="search-hint" style="color:var(--amber);font-weight:700">↻ ${esc(editH.date)} の発注の再発行です（印刷すると履歴が更新されます）</div>`:''}
+      <div class="sheet-controls">
+        <div class="sc-row"><label>発注担当</label><input id="pt-${supId}" value="${esc(tantou0)}" oninput="livePreview('${supId}')"></div>
+        <div class="sc-row"><label>連絡事項</label><textarea id="pm-${supId}" rows="2" placeholder="発注先への連絡があれば入力（発注書の下部に印刷）" oninput="livePreview('${supId}')">${esc(memo0)}</textarea></div>
+      </div>
+      <div class="sheet">${orderSheetHtml(supId, groups[supId], tantou0, memo0)}</div>`;
+    }).join('');
+  document.getElementById('previewOverlay').classList.add('show');
+}
+// 入力するとプレビューの担当者・連絡事項がその場で変わる
+function livePreview(supId){
+  const t = document.getElementById('pt-'+supId).value.trim();
+  const m = document.getElementById('pm-'+supId).value.trim();
+  const st = document.getElementById('st-'+supId);
+  if(st) st.textContent = t || supById(supId).tantou;
+  const sm = document.getElementById('sm-'+supId);
+  if(sm){ sm.style.display = m ? '' : 'none'; sm.querySelector('.mv').textContent = m; }
+}
+function closePreview(){ document.getElementById('previewOverlay').classList.remove('show'); }
+
+function printAndConfirm(){
+  const groups = cartGroups();
+  // プレビューで入力した担当者・連絡事項を反映
+  const tantous = {}, memos = {};
+  Object.keys(groups).forEach(supId=>{
+    const s = supById(supId);
+    const tEl = document.getElementById('pt-'+supId);
+    const mEl = document.getElementById('pm-'+supId);
+    tantous[supId] = (tEl && tEl.value.trim()) || s.tantou;
+    memos[supId] = mEl ? mEl.value.trim() : '';
+    if(tantous[supId] !== s.tantou) tantouOverrides[supId] = tantous[supId]; // 変更を記憶
+    else delete tantouOverrides[supId];
+  });
+  document.getElementById('printArea').innerHTML =
+    Object.keys(groups).map(supId=>`<div class="print-sheet">${orderSheetHtml(supId, groups[supId], tantous[supId], memos[supId])}</div>`).join('');
+  closePreview();
+  setTimeout(()=>{
+    window.print();
+    // 履歴へ登録（再発行編集中なら元の履歴を上書き）
+    const date = todayStr();
+    Object.keys(groups).forEach(supId=>{
+      const s = supById(supId);
+      const lineItems = groups[supId].map(c=>({name:c.name, qty:c.qty, unit:c.unit, size:c.size||'', note:c.note||''}));
+      const editH = editingOrders[supId] ? historyData.find(x=>x.id===editingOrders[supId]) : null;
+      if(editH){
+        editH.date = date;
+        editH.items = lineItems;
+        editH.memo = memos[supId]||'';
+        editH.tantou = tantous[supId];
+        editH.status = 'ordered';
+        delete editingOrders[supId];
+      }else{
+        historyData.unshift({
+          id: Date.now()+Math.floor(Math.random()*1000),
+          date, supplier:s.name, supplierId:supId,
+          items: lineItems,
+          memo: memos[supId]||'', tantou: tantous[supId],
+          status:'ordered'
+        });
+      }
+    });
+    cart = [];
+    saveState(); renderCart(); updateCartBar(); renderSuppliers(); renderItems();
+    showTab('history');
+  }, 150);
+}
+
+// ============================================================
+// 履歴
+// ============================================================
+function renderHistoryFilters(){
+  const supSel = document.getElementById('histSupplier');
+  const curSup = supSel.value;
+  supSel.innerHTML = `<option value="">すべての発注先</option>` + suppliers.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
+  supSel.value = curSup;
+  const monthSel = document.getElementById('histMonth');
+  const curM = monthSel.value;
+  const months = [...new Set(historyData.map(h=>h.date.slice(0,7)))].sort().reverse();
+  monthSel.innerHTML = `<option value="">すべての月</option>` + months.map(m=>`<option value="${m}">${m.replace('/','年')}月</option>`).join('');
+  monthSel.value = curM;
+}
+function renderHistory(){
+  renderHistoryFilters();
+  const sup = document.getElementById('histSupplier').value;
+  const month = document.getElementById('histMonth').value;
+  let list = historyData;
+  if(sup) list = list.filter(h=>h.supplier===sup);
+  if(month) list = list.filter(h=>h.date.startsWith(month));
+  const el = document.getElementById('histList');
+  if(!list.length){
+    el.innerHTML = `<div class="no-items">発注履歴はまだありません。<br>発注書を印刷して確定すると、ここに記録されます</div>`;
+    return;
+  }
+  el.innerHTML = list.map(h=>`
+    <div class="hist-card">
+      <div class="hist-top">
+        <span class="dt">${esc(h.date)}</span>
+        <span class="sp">${esc(h.supplier)}</span>
+        <span class="status ${h.status}">${h.status==='received'?'✓ 入荷済み':'発注済み'}</span>
+      </div>
+      <div class="hist-items">${h.items.map(i=>`${esc(i.name)}${i.size?`［${esc(i.size)}］`:''} × ${i.qty}${esc(i.unit)}${i.note?` <span style="color:#8a978f">（${esc(i.note)}）</span>`:''}`).join('<br>')}</div>
+      ${h.memo?`<div class="hist-items" style="border-top:1px dashed var(--line);padding-top:5px">📝 連絡事項：${esc(h.memo)}</div>`:''}
+      <div class="hist-btns">
+        <button class="ok" onclick="toggleReceived(${h.id})">${h.status==='received'?'↩ 入荷取消':'✓ 入荷確認'}</button>
+        <button onclick="editOrder(${h.id})">✎ 編集して再印刷</button>
+        <button onclick="reorder(${h.id})">🔁 同じ内容で発注</button>
+      </div>
+    </div>`).join('');
+}
+function toggleReceived(id){
+  const h = historyData.find(x=>x.id===id); if(!h) return;
+  h.status = h.status==='received' ? 'ordered' : 'received';
+  saveState(); renderHistory();
+}
+function reorder(id){
+  const h = historyData.find(x=>x.id===id); if(!h) return;
+  const supId = h.supplierId || (suppliers.find(s=>s.name===h.supplier)||{}).id;
+  if(!supId){ alert('発注先が見つかりません'); return; }
+  h.items.forEach(hi=>{
+    const it = (items[supId]?.items||[]).find(i=>i.name===hi.name);
+    const itemId = it ? it.id : 'ghost_'+hi.name;
+    const idx = cart.findIndex(c=>c.supplierId===supId && c.name===hi.name && (c.size||'')===(hi.size||''));
+    if(idx>=0) cart[idx].qty = hi.qty;
+    else cart.push({supplierId:supId, itemId, name:hi.name, qty:hi.qty, unit:hi.unit, size:hi.size||'', note:hi.note||''});
+  });
+  saveState(); updateCartBar(); renderSuppliers();
+  showTab('cart');
+}
+// 確定済みの発注をカートに戻して編集（再印刷すると履歴が上書きされる）
+function editOrder(id){
+  const h = historyData.find(x=>x.id===id); if(!h) return;
+  const supId = h.supplierId || (suppliers.find(s=>s.name===h.supplier)||{}).id;
+  if(!supId){ alert('発注先が見つかりません'); return; }
+  if(!confirm(`${h.date} の ${h.supplier} の発注をカートに戻して編集しますか？\n（品目を追加・変更して印刷し直すと、この履歴が更新されます）`)) return;
+  // その発注先の既存カート行は置き換える
+  cart = cart.filter(c=>c.supplierId!==supId);
+  h.items.forEach(hi=>{
+    const it = (items[supId]?.items||[]).find(i=>i.name===hi.name);
+    cart.push({supplierId:supId, itemId: it?it.id:'ghost_'+hi.name, name:hi.name, qty:hi.qty, unit:hi.unit, size:hi.size||'', note:hi.note||''});
+  });
+  editingOrders[supId] = id;
+  saveState(); updateCartBar(); renderSuppliers();
+  showTab('cart');
+}
+
+// ============================================================
+// 品目マスター 追加・編集・削除
+// ============================================================
+let editing = null; // {supplierId, itemId} / null=新規
+function openItemModal(supplierId, itemId){
+  const supId = supplierId || currentSupplier;
+  if(!supId){ alert('先に発注先を選んでください'); return; }
+  editing = itemId ? {supplierId:supId, itemId} : {supplierId:supId, itemId:null};
+  const data = items[supId];
+  const catSel = document.getElementById('fItemCat');
+  catSel.innerHTML = data.categories.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('') + `<option value="__new__">＋ 新しいカテゴリを作る</option>`;
+  catSel.onchange = ()=>{ document.getElementById('fItemNewCat').style.display = catSel.value==='__new__' ? '' : 'none'; };
+  document.getElementById('fItemNewCat').style.display='none';
+  const it = itemId ? data.items.find(i=>i.id===itemId) : null;
+  document.getElementById('itemModalTitle').textContent = it ? '品目を編集' : `品目を追加（${supById(supId).name}）`;
+  document.getElementById('fItemName').value = it?it.name:'';
+  document.getElementById('fItemUnit').value = it?it.unit:'ケース';
+  document.getElementById('fItemUnitDetail').value = it?(it.unitDetail||''):'';
+  document.getElementById('fItemSizes').value = it&&it.sizes?it.sizes.join(','):'';
+  document.getElementById('fItemNote').value = it?(it.note||''):'';
+  if(it) catSel.value = it.cat;
+  document.getElementById('itemOverlay').classList.add('show');
+}
+function closeItemModal(){ document.getElementById('itemOverlay').classList.remove('show'); editing=null; }
+function saveItem(){
+  const name = document.getElementById('fItemName').value.trim();
+  if(!name){ alert('品名を入力してください'); return; }
+  const supId = editing.supplierId;
+  const data = items[supId];
+  let cat = document.getElementById('fItemCat').value;
+  if(cat==='__new__'){
+    cat = document.getElementById('fItemNewCat').value.trim();
+    if(!cat){ alert('新しいカテゴリ名を入力してください'); return; }
+  }
+  if(!data.categories.includes(cat)) data.categories.push(cat);
+  const sizesRaw = document.getElementById('fItemSizes').value.trim();
+  const sizes = sizesRaw ? sizesRaw.split(/[,、]/).map(s=>s.trim()).filter(Boolean) : null;
+  const payload = {
+    name, cat,
+    unit: document.getElementById('fItemUnit').value.trim() || '個',
+    unitDetail: document.getElementById('fItemUnitDetail').value.trim(),
+    note: document.getElementById('fItemNote').value.trim(),
+  };
+  if(sizes) payload.sizes = sizes;
+  if(editing.itemId){
+    const it = data.items.find(i=>i.id===editing.itemId);
+    Object.assign(it, payload);
+    if(!sizes) delete it.sizes;
+  }else{
+    data.items.push({ id:'u'+Date.now(), ...payload });
+  }
+  saveState(); closeItemModal(); renderItems(); renderSuppliers();
+}
+function deleteItem(supplierId,itemId){
+  const it = items[supplierId].items.find(i=>i.id===itemId);
+  if(!confirm(`「${it.name}」を削除しますか？`)) return;
+  items[supplierId].items = items[supplierId].items.filter(i=>i.id!==itemId);
+  saveState(); renderItems(); renderSuppliers();
+}
+
+// ============================================================
+// ルールモーダル
+// ============================================================
+function openManual(){ document.getElementById('manualOverlay').classList.add('show'); }
+function closeManual(){ document.getElementById('manualOverlay').classList.remove('show'); }
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click', e=>{ if(e.target===o) o.classList.remove('show'); });
+});
+
+// ============================================================
+// 初期化
+// ============================================================
+renderSuppliers();
+renderItems();
+updateCartBar();
+
+</script>
+</body>
+</html>
