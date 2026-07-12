@@ -175,6 +175,15 @@ table.ps-table td.nt{font-size:9pt;color:#222;width:30%;}
 .ps-confirm .box{border:1.5px solid #000;width:220px;}
 .ps-confirm .box .lbl{border-bottom:1px solid #000;font-size:9.5pt;text-align:center;padding:2px;}
 .ps-confirm .box .sp{height:58px;}
+.ps-memo{margin-top:10px;border:1.5px solid #000;padding:7px 10px;font-size:10.5pt;line-height:1.7;white-space:pre-wrap;}
+.cart-note-input{display:block;width:100%;border:1px dashed var(--line);border-radius:6px;padding:5px 8px;font-size:12.5px;margin-top:4px;color:#4a5a51;background:#fbfcfa;}
+.cart-note-input:focus{outline:none;border-color:var(--green);border-style:solid;background:#fff;}
+.sheet-controls{background:var(--green-pale);border:1px solid #c6dfd0;border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.sheet-controls .sc-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:6px;}
+.sheet-controls .sc-row:last-child{margin-bottom:0;}
+.sheet-controls label{flex-shrink:0;width:70px;font-size:12.5px;font-weight:700;color:var(--green-dark);padding-top:8px;}
+.sheet-controls input,.sheet-controls textarea{flex:1;border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;background:#fff;}
+.sheet-controls input:focus,.sheet-controls textarea:focus{outline:none;border-color:var(--green);}
 
 /* ===== 印刷 ===== */
 .print-area{display:none;}
@@ -621,10 +630,12 @@ const KEY_V2='chikusui_order_app_v2', KEY_V1='chikusui_order_app_v1';
 let items = JSON.parse(JSON.stringify(baseItems));
 let historyData = [];
 let cart = [];
+let tantouOverrides = {}; // 発注担当者の変更を記憶 {supplierId: 名前}
+function getTantou(s){ return tantouOverrides[s.id] || s.tantou; }
 
 function saveState(){
   try{
-    localStorage.setItem(KEY_V2, JSON.stringify({cart, historyData, items, masterVersion:2, savedAt:new Date().toISOString()}));
+    localStorage.setItem(KEY_V2, JSON.stringify({cart, historyData, items, tantouOverrides, masterVersion:2, savedAt:new Date().toISOString()}));
   }catch(e){ console.warn('保存失敗', e); }
 }
 (function loadState(){
@@ -634,6 +645,7 @@ function saveState(){
       const s = JSON.parse(raw2);
       if(Array.isArray(s.cart)) cart = s.cart;
       if(Array.isArray(s.historyData)) historyData = s.historyData;
+      if(s.tantouOverrides) tantouOverrides = s.tantouOverrides;
       if(s.masterVersion===2 && s.items){
         items = s.items;            // 現行版：編集・削除をそのまま復元
       }else if(s.items){
@@ -902,7 +914,9 @@ function renderCart(){
       ${groups[supId].map(c=>{
         const key = `${c.supplierId}|${c.itemId}|${c.size||''}`;
         return `<div class="cart-line">
-          <div class="nm">${esc(c.name)}${c.size?` <span class="sz">［${esc(c.size)}］</span>`:''}</div>
+          <div class="nm">${esc(c.name)}${c.size?` <span class="sz">［${esc(c.size)}］</span>`:''}
+            <input class="cart-note-input" placeholder="備考（発注書の備考欄に印刷されます）" value="${esc(c.note||'')}" onchange="cartSetNote('${key}',this.value)">
+          </div>
           <div class="qty-box has">
             <button onclick="cartStep('${key}',-1)">−</button>
             <input type="number" min="1" inputmode="numeric" value="${c.qty}" onchange="cartSet('${key}',this.value)">
@@ -930,6 +944,11 @@ function cartSet(key,val){
   cart[i].qty = Math.max(1, v);
   saveState(); renderCart(); updateCartBar();
 }
+function cartSetNote(key,val){
+  const i = findCartByKey(key); if(i<0) return;
+  cart[i].note = val.trim();
+  saveState();
+}
 function cartRemove(key){
   const i = findCartByKey(key); if(i<0) return;
   cart.splice(i,1);
@@ -943,7 +962,7 @@ function clearCart(){
 // ============================================================
 // 発注書（プレビュー・印刷共通）
 // ============================================================
-function orderSheetHtml(supId, lines){
+function orderSheetHtml(supId, lines, tantou, memo){
   const s = supById(supId);
   const tel = s.tel || COMPANY.telDefault;
   const showFax = s.fax && s.fax !== '—';
@@ -951,7 +970,7 @@ function orderSheetHtml(supId, lines){
       <td>${esc(c.name)}${c.size?`　<b>サイズ：${esc(c.size)}</b>`:''}</td>
       <td class="num">${c.qty}</td>
       <td class="unit">${esc(c.unit)}</td>
-      <td class="nt"></td>
+      <td class="nt">${esc(c.note||'')}</td>
     </tr>`).join('');
   const blank = `<tr class="ps-blank"><td></td><td class="num"></td><td class="unit"></td><td class="nt"></td></tr>`.repeat(2);
   return `
@@ -966,7 +985,7 @@ function orderSheetHtml(supId, lines){
         ${esc(COMPANY.addr)}<br>
         TEL　${esc(tel)}<br>
         FAX　${esc(COMPANY.fax)}<br>
-        発注担当　${esc(s.tantou)}
+        発注担当　<span id="st-${supId}">${esc(tantou ?? getTantou(s))}</span>
       </div>
     </div>
     <div class="ps-title">発注書</div>
@@ -978,6 +997,7 @@ function orderSheetHtml(supId, lines){
     </table>
     ${s.place?`<div class="ps-place">納入場所：${esc(s.place)}</div>`:''}
     ${s.note?`<div class="ps-note">※ ${esc(s.note)}</div>`:''}
+    <div class="ps-memo" id="sm-${supId}" style="${memo?'':'display:none'}"><b>連絡事項：</b><span class="mv">${esc(memo||'')}</span></div>
     <div class="ps-confirm"><div class="box"><div class="lbl">貴社確認欄</div><div class="sp"></div></div></div>`;
 }
 
@@ -986,15 +1006,42 @@ function showPreview(){
   const groups = cartGroups();
   document.getElementById('previewBody').innerHTML =
     `<div class="search-hint" style="margin-bottom:10px">${Object.keys(groups).length}社分の発注書を作成します（発注先ごとに1枚ずつ印刷されます）</div>`
-    + Object.keys(groups).map(supId=>`<div class="sheet">${orderSheetHtml(supId, groups[supId])}</div>`).join('');
+    + Object.keys(groups).map(supId=>{
+      const s = supById(supId);
+      return `<div class="sheet-controls">
+        <div class="sc-row"><label>発注担当</label><input id="pt-${supId}" value="${esc(getTantou(s))}" oninput="livePreview('${supId}')"></div>
+        <div class="sc-row"><label>連絡事項</label><textarea id="pm-${supId}" rows="2" placeholder="発注先への連絡があれば入力（発注書の下部に印刷）" oninput="livePreview('${supId}')"></textarea></div>
+      </div>
+      <div class="sheet">${orderSheetHtml(supId, groups[supId])}</div>`;
+    }).join('');
   document.getElementById('previewOverlay').classList.add('show');
+}
+// 入力するとプレビューの担当者・連絡事項がその場で変わる
+function livePreview(supId){
+  const t = document.getElementById('pt-'+supId).value.trim();
+  const m = document.getElementById('pm-'+supId).value.trim();
+  const st = document.getElementById('st-'+supId);
+  if(st) st.textContent = t || supById(supId).tantou;
+  const sm = document.getElementById('sm-'+supId);
+  if(sm){ sm.style.display = m ? '' : 'none'; sm.querySelector('.mv').textContent = m; }
 }
 function closePreview(){ document.getElementById('previewOverlay').classList.remove('show'); }
 
 function printAndConfirm(){
   const groups = cartGroups();
+  // プレビューで入力した担当者・連絡事項を反映
+  const tantous = {}, memos = {};
+  Object.keys(groups).forEach(supId=>{
+    const s = supById(supId);
+    const tEl = document.getElementById('pt-'+supId);
+    const mEl = document.getElementById('pm-'+supId);
+    tantous[supId] = (tEl && tEl.value.trim()) || s.tantou;
+    memos[supId] = mEl ? mEl.value.trim() : '';
+    if(tantous[supId] !== s.tantou) tantouOverrides[supId] = tantous[supId]; // 変更を記憶
+    else delete tantouOverrides[supId];
+  });
   document.getElementById('printArea').innerHTML =
-    Object.keys(groups).map(supId=>`<div class="print-sheet">${orderSheetHtml(supId, groups[supId])}</div>`).join('');
+    Object.keys(groups).map(supId=>`<div class="print-sheet">${orderSheetHtml(supId, groups[supId], tantous[supId], memos[supId])}</div>`).join('');
   closePreview();
   setTimeout(()=>{
     window.print();
@@ -1005,7 +1052,8 @@ function printAndConfirm(){
       historyData.unshift({
         id: Date.now()+Math.floor(Math.random()*1000),
         date, supplier:s.name, supplierId:supId,
-        items: groups[supId].map(c=>({name:c.name, qty:c.qty, unit:c.unit, size:c.size||''})),
+        items: groups[supId].map(c=>({name:c.name, qty:c.qty, unit:c.unit, size:c.size||'', note:c.note||''})),
+        memo: memos[supId]||'', tantou: tantous[supId],
         status:'ordered'
       });
     });
@@ -1048,7 +1096,8 @@ function renderHistory(){
         <span class="sp">${esc(h.supplier)}</span>
         <span class="status ${h.status}">${h.status==='received'?'✓ 入荷済み':'発注済み'}</span>
       </div>
-      <div class="hist-items">${h.items.map(i=>`${esc(i.name)}${i.size?`［${esc(i.size)}］`:''} × ${i.qty}${esc(i.unit)}`).join('<br>')}</div>
+      <div class="hist-items">${h.items.map(i=>`${esc(i.name)}${i.size?`［${esc(i.size)}］`:''} × ${i.qty}${esc(i.unit)}${i.note?` <span style="color:#8a978f">（${esc(i.note)}）</span>`:''}`).join('<br>')}</div>
+      ${h.memo?`<div class="hist-items" style="border-top:1px dashed var(--line);padding-top:5px">📝 連絡事項：${esc(h.memo)}</div>`:''}
       <div class="hist-btns">
         <button class="ok" onclick="toggleReceived(${h.id})">${h.status==='received'?'↩ 入荷取消':'✓ 入荷確認'}</button>
         <button onclick="reorder(${h.id})">🔁 同じ内容で発注</button>
@@ -1069,7 +1118,7 @@ function reorder(id){
     const itemId = it ? it.id : 'ghost_'+hi.name;
     const idx = cart.findIndex(c=>c.supplierId===supId && c.name===hi.name && (c.size||'')===(hi.size||''));
     if(idx>=0) cart[idx].qty = hi.qty;
-    else cart.push({supplierId:supId, itemId, name:hi.name, qty:hi.qty, unit:hi.unit, size:hi.size||''});
+    else cart.push({supplierId:supId, itemId, name:hi.name, qty:hi.qty, unit:hi.unit, size:hi.size||'', note:hi.note||''});
   });
   saveState(); updateCartBar(); renderSuppliers();
   showTab('cart');
