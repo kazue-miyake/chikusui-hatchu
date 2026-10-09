@@ -82,6 +82,7 @@ main{max-width:1080px;margin:0 auto;padding:14px 14px 110px;}
 .item-name .code{font-weight:400;color:#8a978f;font-size:12px;}
 .item-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;font-size:11.5px;}
 .tag-unit{background:#eef2ee;border-radius:5px;padding:1px 7px;color:#5a6a61;}
+.tag-new{background:#fdf0dc;border-radius:5px;padding:1px 7px;color:#9a6b13;font-weight:700;}
 .tag-sup{background:var(--green-pale);border-radius:5px;padding:1px 7px;color:var(--green-dark);font-weight:700;}
 .item-note{font-size:12px;color:#7a8a80;margin-top:2px;line-height:1.45;}
 .item-prev{font-size:11.5px;color:var(--amber);background:var(--amber-pale);border-radius:5px;padding:1px 7px;display:inline-block;margin-top:3px;font-weight:500;}
@@ -102,6 +103,7 @@ main{max-width:1080px;margin:0 auto;padding:14px 14px 110px;}
 .cart-group{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
 .cart-group-head{background:var(--green-pale);padding:9px 14px;font-weight:700;color:var(--green-dark);display:flex;justify-content:space-between;font-size:14px;}
 .cart-group-head .fx{font-weight:400;font-size:12px;color:#5a6a61;}
+.cart-group-head .reissue{background:var(--amber-pale);color:var(--amber);font-size:11px;border-radius:5px;padding:1px 7px;margin-left:6px;font-weight:700;}
 .cart-line{display:flex;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid #edf1ed;}
 .cart-line .nm{flex:1;font-size:13.5px;min-width:0;}
 .cart-line .nm .sz{color:var(--green-dark);font-weight:700;}
@@ -430,9 +432,9 @@ makino:{categories:['外売りパック','折重','外箱・仕切','丼・オ�
  {id:'mk34',name:'中仕切65-65 C-3 黒',cat:'外箱・仕切',unit:'ケース',unitDetail:'400入',note:'9マス'},
  {id:'mk35',name:'CZ-220 BS黒本体（N）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:'いろは・めぐみ・牛しぐれ幕・お手軽・留置'},
  {id:'mk36',name:'CZ-220 透明蓋（N）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:'お手軽・留置'},
- {id:'mk37',name:'キョウゼン10B イチボク（外箱）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:'唐揚げ入り幕の内・納得幕の内'},
- {id:'mk38',name:'キョウゼン10 ナカサラ1 黒（中仕切）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:''},
- {id:'mk39',name:'キョウゼン10 ナカサラ1 黒（蓋）',cat:'外箱・仕切',unit:'ケース',unitDetail:'600入',note:''},
+ {id:'mk37',name:'キョウゼン10B イチボク（外箱）',cat:'外箱・仕切',unit:'ケース',unitDetail:'50入',note:'唐揚げ入り幕の内・納得幕の内'},
+ {id:'mk38',name:'キョウゼン10 ナカサラ1 黒（中仕切）',cat:'外箱・仕切',unit:'ケース',unitDetail:'50入',note:''},
+ {id:'mk39',name:'キョウゼン10-OC（蓋）',cat:'外箱・仕切',unit:'ケース',unitDetail:'50入',note:''},
  {id:'mk40',name:'角折（小）用 十字仕切り',cat:'外箱・仕切',unit:'ケース',unitDetail:'280入',note:''},
  {id:'mk41',name:'まめ吉 No.210 竹酔別注',cat:'外箱・仕切',unit:'ケース',unitDetail:'100入',note:'ホテル系 折 外箱'},
  {id:'mk42',name:'SDビストロM 24-18仕切 BK 身',cat:'丼・オードブル',unit:'ケース',unitDetail:'450入',note:'カレー'},
@@ -473,9 +475,9 @@ makino:{categories:['外売りパック','折重','外箱・仕切','丼・オ�
  {id:'mk77',name:'ラミラプ30-35 未晒アミューズBR（唐揚げ中紙）',cat:'袋・紙袋',unit:'枚',unitDetail:'200入',note:'商品コード 004738226'},
  {id:'mk78',name:'ヘイコー不織布おしぼり 平130X180',cat:'消耗品・衛生',unit:'本',unitDetail:'2500入',note:''},
  {id:'mk79',name:'バイオハンドハイパー 3L',cat:'消耗品・衛生',unit:'本',unitDetail:'1000入',note:''},
- {id:'mk80',name:'OPP袋入り楊枝',cat:'消耗品・衛生',unit:'本',unitDetail:'1000入',note:''},
+ {id:'mk80',name:'OPP袋入り楊枝',cat:'消耗品・衛生',unit:'本',unitDetail:'1000入',note:'HEIKO 楊枝 箱入 OPP袋入 60mm（商品コード 1403140225・約1000本/箱）'},
  {id:'mk81',name:'鉄砲串 9㎝ 250本入',cat:'消耗品・衛生',unit:'袋',unitDetail:'',note:''},
- {id:'mk82',name:'クッキングペーパー 中',cat:'消耗品・衛生',unit:'個',unitDetail:'2入',note:''},
+ {id:'mk82',name:'クッキングペーパー 中',cat:'消耗品・衛生',unit:'個',unitDetail:'2入',note:'PHクッキングペーパー中 2R FSM（商品コード 0030306658）'},
  {id:'mk83',name:'中性洗剤ピアレスE 18㎏',cat:'消耗品・衛生',unit:'個',unitDetail:'',note:''},
  {id:'mk84',name:'ストレッチポリZ ブルーSS',cat:'消耗品・衛生',unit:'枚',unitDetail:'4000入',note:''},
  {id:'mk85',name:'ポリマラップ営業用 30cmX100m',cat:'消耗品・衛生',unit:'本',unitDetail:'',note:''},
@@ -490,6 +492,14 @@ makino:{categories:['外売りパック','折重','外箱・仕切','丼・オ�
  {id:'mk94',name:'グルメシート 熊笹・ヌキ',cat:'カトラリー・シート',unit:'袋',unitDetail:'',note:''},
  {id:'mk95',name:'スワン手切れOPPテープ 赤 18X35',cat:'テープ',unit:'個',unitDetail:'10入',note:''},
  {id:'mk96',name:'ニチバン セロテープ430 青 18X35',cat:'テープ',unit:'個',unitDetail:'10入',note:''},
+ {"id": "mk97", "name": "紙BOX65-65 黄鈴 ワンピース", "cat": "外箱・仕切", "unit": "枚", "unitDetail": "1枚単位（別注品）", "note": "商品コード 9999999／単価35円（7/1納品）", "isNew": true},
+ {"id": "mk98", "name": "オードブル507DX 本体(V) 359X232X25", "cat": "丼・オードブル", "unit": "ケース", "unitDetail": "20入", "note": "商品コード 0400040505／単価77円（7/30納品）", "isNew": true},
+ {"id": "mk99", "name": "オードブル507 透明蓋 361X234X40", "cat": "丼・オードブル", "unit": "ケース", "unitDetail": "20入", "note": "商品コード 0400040506／単価72円（7/30納品）", "isNew": true},
+ {"id": "mk100", "name": "晒フードカップ PP浅型 750ml", "cat": "カップ・小物", "unit": "個", "unitDetail": "25個入/袋", "note": "4490406／単価21〜22.5円（9/14納品は500個）", "isNew": true},
+ {"id": "mk101", "name": "未晒・晒フードカップ用 透明フタ 150口径", "cat": "カップ・小物", "unit": "個", "unitDetail": "50入", "note": "商品コード 1400143632（004460534）／単価15.7円", "isNew": true},
+ {"id": "mk102", "name": "業務用Fujiクッキングシート 33X30m", "cat": "消耗品・衛生", "unit": "本", "unitDetail": "1本単位OK（30本=1ケース）", "note": "商品コード 1170117231／単価410〜450円", "isNew": true},
+ {"id": "mk103", "name": "静岡市家庭用ごみ袋 45L（平）50P", "cat": "袋・紙袋", "unit": "パック", "unitDetail": "50枚入/パック", "note": "商品コード 4720472034／単価580円（8/7納品 10パック）", "isNew": true},
+ {"id": "mk104", "name": "ピュアパック S8-25 80X250", "cat": "袋・紙袋", "unit": "ケース", "unitDetail": "1000入", "note": "商品コード 1400143214（006798214）／単価2.4円", "isNew": true},
  {id:'mn01',name:'バイオハンドハイパー 弁当用 特大',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
  {id:'mn02',name:'竹酔 8寸角切 自動セット',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
  {id:'mn03',name:'白無地 8寸角切 自動セット',cat:'現在注文していない商品',unit:'枚',unitDetail:'1000入',note:''},
@@ -631,11 +641,13 @@ let items = JSON.parse(JSON.stringify(baseItems));
 let historyData = [];
 let cart = [];
 let tantouOverrides = {}; // 発注担当者の変更を記憶 {supplierId: 名前}
+let editingOrders = {};   // 再発行編集中の発注 {supplierId: 履歴ID}
+let appliedPatches = [];  // 適用済みのデータ更新
 function getTantou(s){ return tantouOverrides[s.id] || s.tantou; }
 
 function saveState(){
   try{
-    localStorage.setItem(KEY_V2, JSON.stringify({cart, historyData, items, tantouOverrides, masterVersion:2, savedAt:new Date().toISOString()}));
+    localStorage.setItem(KEY_V2, JSON.stringify({cart, historyData, items, tantouOverrides, editingOrders, appliedPatches, masterVersion:2, savedAt:new Date().toISOString()}));
   }catch(e){ console.warn('保存失敗', e); }
 }
 (function loadState(){
@@ -646,6 +658,8 @@ function saveState(){
       if(Array.isArray(s.cart)) cart = s.cart;
       if(Array.isArray(s.historyData)) historyData = s.historyData;
       if(s.tantouOverrides) tantouOverrides = s.tantouOverrides;
+      if(s.editingOrders) editingOrders = s.editingOrders;
+      if(Array.isArray(s.appliedPatches)) appliedPatches = s.appliedPatches;
       if(s.masterVersion===2 && s.items){
         items = s.items;            // 現行版：編集・削除をそのまま復元
       }else if(s.items){
@@ -665,6 +679,48 @@ function saveState(){
     }
   }catch(e){ console.warn('読込失敗', e); }
 })();
+
+// ============================================================
+// データ更新パッチ（保存済みデータにも1回だけ適用）
+// ============================================================
+const DATA_PATCHES = [
+  { id:'2026-10_makino_delivery', // 牧野製袋 2026年7〜9月 納品書より
+    newItems: [{"id": "mk97", "name": "紙BOX65-65 黄鈴 ワンピース", "cat": "外箱・仕切", "unit": "枚", "unitDetail": "1枚単位（別注品）", "note": "商品コード 9999999／単価35円（7/1納品）"}, {"id": "mk98", "name": "オードブル507DX 本体(V) 359X232X25", "cat": "丼・オードブル", "unit": "ケース", "unitDetail": "20入", "note": "商品コード 0400040505／単価77円（7/30納品）"}, {"id": "mk99", "name": "オードブル507 透明蓋 361X234X40", "cat": "丼・オードブル", "unit": "ケース", "unitDetail": "20入", "note": "商品コード 0400040506／単価72円（7/30納品）"}, {"id": "mk100", "name": "晒フードカップ PP浅型 750ml", "cat": "カップ・小物", "unit": "個", "unitDetail": "25個入/袋", "note": "4490406／単価21〜22.5円（9/14納品は500個）"}, {"id": "mk101", "name": "未晒・晒フードカップ用 透明フタ 150口径", "cat": "カップ・小物", "unit": "個", "unitDetail": "50入", "note": "商品コード 1400143632（004460534）／単価15.7円"}, {"id": "mk102", "name": "業務用Fujiクッキングシート 33X30m", "cat": "消耗品・衛生", "unit": "本", "unitDetail": "1本単位OK（30本=1ケース）", "note": "商品コード 1170117231／単価410〜450円"}, {"id": "mk103", "name": "静岡市家庭用ごみ袋 45L（平）50P", "cat": "袋・紙袋", "unit": "パック", "unitDetail": "50枚入/パック", "note": "商品コード 4720472034／単価580円（8/7納品 10パック）"}, {"id": "mk104", "name": "ピュアパック S8-25 80X250", "cat": "袋・紙袋", "unit": "ケース", "unitDetail": "1000入", "note": "商品コード 1400143214（006798214）／単価2.4円"}],
+    fixes: {"mk37": {"unitDetail": "50入"}, "mk38": {"name": "キョウゼン10 ナカサラ1 黒（中仕切）", "unitDetail": "50入"}, "mk39": {"name": "キョウゼン10-OC（蓋）", "unitDetail": "50入"}, "mk80": {"note": "HEIKO 楊枝 箱入 OPP袋入 60mm（商品コード 1403140225・約1000本/箱）"}, "mk82": {"note": "PHクッキングペーパー中 2R FSM（商品コード 0030306658）"}},
+    history: [{"id": 12272701, "date": "2026/09/28", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "角折（小）用 十字仕切り", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12272701"}, {"id": 12272284, "date": "2026/09/25", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ピュアパック S8-25 80X250", "qty": 2, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12272284"}, {"id": 12272553, "date": "2026/09/24", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "紙BOX65-65 おひとつ", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "T-WU-302-44 嵌合広蓋（ops）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "MSD古典-5 本体 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12272553"}, {"id": 12272092, "date": "2026/09/18", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ヘイコー不織布おしぼり 平130X180", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "70-70 風月花", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "弁当バック 特大 半透明（持ち帰り用ビニール）", "qty": 2, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12272092"}, {"id": 12271899, "date": "2026/09/17", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "LB-K2/145 哥仙 共蓋付", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "規格袋 №15（紐付）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "70-70 風月花", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12271899"}, {"id": 12271206, "date": "2026/09/14", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "未晒・晒フードカップ用 透明フタ 150口径", "qty": 500, "unit": "個", "size": "", "note": ""}, {"name": "晒フードカップ PP浅型 750ml", "qty": 500, "unit": "個", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12271206"}, {"id": 12271165, "date": "2026/09/14", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "キョウゼン10B イチボク（外箱）", "qty": 6, "unit": "ケース", "size": "", "note": ""}, {"name": "キョウゼン10 ナカサラ1 黒（中仕切）", "qty": 6, "unit": "ケース", "size": "", "note": ""}, {"name": "キョウゼン10-OC（蓋）", "qty": 6, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12271165"}, {"id": 12270839, "date": "2026/09/11", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ニチバン セロテープ430 青 18X35", "qty": 1, "unit": "箱", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "タレビン 角中（D）改（しおだれ）", "qty": 4, "unit": "袋", "size": "", "note": ""}, {"name": "フィルムケース 雲龍 6号 白", "qty": 10, "unit": "パック", "size": "", "note": ""}, {"name": "クッキングペーパー 中", "qty": 3, "unit": "個", "size": "", "note": ""}, {"name": "ばんじゅう用 内袋 No.105 ナチュラル", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12270839"}, {"id": 12270841, "date": "2026/09/11", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12270841"}, {"id": 12270220, "date": "2026/09/08", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ばんじゅう用 内袋 No.105 ナチュラル", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "紙BOX65-65 おひとつ", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "OPP袋入り楊枝", "qty": 4, "unit": "箱", "size": "", "note": ""}, {"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12270220"}, {"id": 12269485, "date": "2026/09/04", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "クッキングペーパー 中", "qty": 2, "unit": "個", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12269485"}, {"id": 12268841, "date": "2026/09/01", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "MSD古典-5 本体 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "T-WU-302-44 嵌合広蓋（ops）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "規格袋 №15（紐付）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "ポリマラップ営業用 45cmX100m", "qty": 10, "unit": "本", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12268841"}, {"id": 12268842, "date": "2026/09/01", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ラミラプ30-35 未晒アミューズBR（唐揚げ中紙）", "qty": 5, "unit": "袋", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12268842"}, {"id": 12268302, "date": "2026/08/28", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "未晒・晒フードカップ用 透明フタ 150口径", "qty": 100, "unit": "個", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12268302"}, {"id": 12267570, "date": "2026/08/25", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "OPP 230X230", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "業務用Fujiクッキングシート 33X30m", "qty": 30, "unit": "本", "size": "", "note": ""}, {"name": "バラン 豆山(1/2)型", "qty": 2, "unit": "個", "size": "", "note": ""}, {"name": "晒フードカップ PP浅型 750ml", "qty": 100, "unit": "個", "size": "", "note": ""}, {"name": "70-70 風月花", "qty": 2, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12267570"}, {"id": 12267573, "date": "2026/08/25", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ヘイコー不織布おしぼり 平130X180", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12267573"}, {"id": 12266548, "date": "2026/08/19", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "70-70 C-1 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "中性洗剤ピアレスE 18㎏", "qty": 1, "unit": "個", "size": "", "note": ""}, {"name": "フィルムケース 5F 透明", "qty": 10, "unit": "パック", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "クッキングペーパー 中", "qty": 2, "unit": "個", "size": "", "note": ""}, {"name": "ポリマラップ営業用 45cmX100m", "qty": 3, "unit": "本", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12266548"}, {"id": 12266550, "date": "2026/08/19", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "T-古典-5 嵌合蓋 OPS", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12266550"}, {"id": 12265301, "date": "2026/08/07", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "タレビン 角中（D）改（しおだれ）", "qty": 3, "unit": "袋", "size": "", "note": ""}, {"name": "70-70 C-1 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12265301"}, {"id": 12265280, "date": "2026/08/07", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "静岡市家庭用ごみ袋 45L（平）50P", "qty": 10, "unit": "パック", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12265280"}, {"id": 12264658, "date": "2026/08/05", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "T-WU-302-44 嵌合広蓋（ops）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "MSD古典-5 本体 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "70-70 風月花", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12264658"}, {"id": 12264059, "date": "2026/08/04", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "晒フードカップ PP浅型 750ml", "qty": 25, "unit": "個", "size": "", "note": ""}, {"name": "未晒・晒フードカップ用 透明フタ 150口径", "qty": 50, "unit": "個", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12264059"}, {"id": 12263480, "date": "2026/07/30", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "業務用Fujiクッキングシート 33X30m", "qty": 10, "unit": "本", "size": "", "note": ""}, {"name": "OPP袋入り楊枝", "qty": 4, "unit": "箱", "size": "", "note": ""}, {"name": "オードブル507DX 本体(V) 359X232X25", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "オードブル507 透明蓋 361X234X40", "qty": 2, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12263480"}, {"id": 12263216, "date": "2026/07/29", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "グルメシート 三枚笹・丸", "qty": 3, "unit": "袋", "size": "", "note": ""}, {"name": "規格袋 №15（紐付）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "MSD古典-5 本体 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "T-古典-5 嵌合蓋 OPS", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12263216"}, {"id": 12262695, "date": "2026/07/27", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "紙BOX65-65 おひとつ", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "ヘイコー不織布おしぼり 平130X180", "qty": 2, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12262695"}, {"id": 12262126, "date": "2026/07/23", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "SDビストロM 24-18仕切 BK 身", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "SDビストロM 24-18仕切 蓋", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "ポリマラップ営業用 45cmX100m", "qty": 10, "unit": "本", "size": "", "note": ""}, {"name": "クッキングペーパー 中", "qty": 2, "unit": "個", "size": "", "note": ""}, {"name": "フィルムケース 5F 透明", "qty": 10, "unit": "パック", "size": "", "note": ""}, {"name": "タレビン 角中（D）改（しおだれ）", "qty": 3, "unit": "袋", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12262126"}, {"id": 12260681, "date": "2026/07/15", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ばんじゅう用 内袋 No.105 ナチュラル", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "フラットバッグ M かすみ草（葬儀 袋）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "ポリマラップ営業用 30cmX100m", "qty": 10, "unit": "本", "size": "", "note": ""}, {"name": "70-70 C-1 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "T-WU-302-44 嵌合広蓋（ops）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12260681"}, {"id": 12260682, "date": "2026/07/15", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "紙BOX65-65 おひとつ", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12260682"}, {"id": 12260311, "date": "2026/07/14", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "紙BOX65-65 おひとつ", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12260311"}, {"id": 12259464, "date": "2026/07/09", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "WU-302 44 本体 本陣金", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12259464"}, {"id": 12258910, "date": "2026/07/07", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ワン折重HW-60K(45) 杉Ⅳ落蓋セット", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "中仕切65-65 C-3 黒", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 BS黒本体（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "CZ-220 透明蓋（N）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12258910"}, {"id": 12259045, "date": "2026/07/06", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "ワン折重81×55H 黒底", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "ワン折重81×55 杉共蓋", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "ワン折重81×55(45) 杉縁", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "規格袋 №15（紐付）", "qty": 1, "unit": "ケース", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12259045"}, {"id": 12258195, "date": "2026/07/01", "supplier": "牧野", "supplierId": "makino", "items": [{"name": "70-70 風月花", "qty": 2, "unit": "ケース", "size": "", "note": ""}, {"name": "紙BOX65-65 おひとつ", "qty": 1, "unit": "ケース", "size": "", "note": ""}, {"name": "紙BOX65-65 黄鈴 ワンピース", "qty": 400, "unit": "枚", "size": "", "note": ""}], "memo": "", "tantou": "", "status": "received", "source": "delivery", "slipNo": "12258195"}] },
+];
+(function applyDataPatches(){
+  let changed = false;
+  DATA_PATCHES.forEach(pt=>{
+    if(appliedPatches.includes(pt.id)) return;
+    const supId = 'makino';
+    if(!items[supId]) items[supId] = {categories:[], items:[]};
+    const grp = items[supId];
+    // 新規品目（未登録のものだけ追加）
+    pt.newItems.forEach(ni=>{
+      if(grp.items.some(i=>i.id===ni.id || i.name===ni.name)) return;
+      const it = Object.assign({}, ni, {isNew:true});
+      const idx = grp.items.findIndex(i=>i.cat==='現在注文していない商品');
+      if(idx>=0) grp.items.splice(idx,0,it); else grp.items.push(it);
+      if(!grp.categories.includes(it.cat)) grp.categories.push(it.cat);
+    });
+    // 既存品目の名称・入数の修正
+    Object.keys(pt.fixes).forEach(id=>{
+      const it = grp.items.find(i=>i.id===id);
+      if(it) Object.assign(it, pt.fixes[id]);
+    });
+    // 納品書から発注履歴を取込（同じ伝票は二重登録しない）
+    pt.history.forEach(hh=>{
+      if(historyData.some(x=>x.id===hh.id)) return;
+      historyData.push(JSON.parse(JSON.stringify(hh)));
+    });
+    historyData.sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    appliedPatches.push(pt.id);
+    changed = true;
+  });
+  if(changed) saveState();
+})();
+
 // 旧データのうち「ユーザーが画面から追加した品目」だけを新マスターに合流させる
 // 旧版の追加品目ID：発注先ID-xxxx（例 takagi-lx3f2a）／新版：u+数字
 function mergeUserItems(saved){
@@ -753,6 +809,7 @@ function itemRowHtml(it, sup, showSup){
       <div class="item-name">${esc(it.name)}</div>
       <div class="item-tags">
         ${showSup?`<span class="tag-sup">${esc(sup.name)}</span>`:''}
+        ${it.isNew?`<span class="tag-new">納品書から追加</span>`:''}
         <span class="tag-unit">${esc(it.unit)}${it.unitDetail?'・'+esc(it.unitDetail):''}</span>
       </div>
       ${it.note?`<div class="item-note">${esc(it.note)}</div>`:''}
@@ -858,6 +915,7 @@ function applyQty(supplierId,itemId,qty){
     else cart.push({supplierId, itemId, name:it.name, qty, unit:it.unit, size:size||''});
   }else if(idx>=0){
     cart.splice(idx,1);
+    if(!cart.some(c=>c.supplierId===supplierId)) delete editingOrders[supplierId];
   }
   const qb=document.getElementById('qb-'+itemId);
   if(qb) qb.classList.toggle('has', qty>0);
@@ -910,7 +968,7 @@ function renderCart(){
   el.innerHTML = Object.keys(groups).map(supId=>{
     const s = supById(supId);
     return `<div class="cart-group">
-      <div class="cart-group-head"><span>${esc(s.name)}</span><span class="fx">FAX ${esc(s.fax)}</span></div>
+      <div class="cart-group-head"><span>${esc(s.name)}${editingOrders[supId]?` <span class="reissue">再発行編集中</span>`:''}</span><span class="fx">FAX ${esc(s.fax)}</span></div>
       ${groups[supId].map(c=>{
         const key = `${c.supplierId}|${c.itemId}|${c.size||''}`;
         return `<div class="cart-line">
@@ -951,12 +1009,14 @@ function cartSetNote(key,val){
 }
 function cartRemove(key){
   const i = findCartByKey(key); if(i<0) return;
+  const supId = cart[i].supplierId;
   cart.splice(i,1);
+  if(!cart.some(c=>c.supplierId===supId)) delete editingOrders[supId];
   saveState(); renderCart(); updateCartBar(); renderSuppliers();
 }
 function clearCart(){
   if(!confirm('カートを全てクリアしますか？')) return;
-  cart = []; saveState(); renderCart(); updateCartBar(); renderSuppliers(); renderItems();
+  cart = []; editingOrders = {}; saveState(); renderCart(); updateCartBar(); renderSuppliers(); renderItems();
 }
 
 // ============================================================
@@ -1008,11 +1068,15 @@ function showPreview(){
     `<div class="search-hint" style="margin-bottom:10px">${Object.keys(groups).length}社分の発注書を作成します（発注先ごとに1枚ずつ印刷されます）</div>`
     + Object.keys(groups).map(supId=>{
       const s = supById(supId);
-      return `<div class="sheet-controls">
-        <div class="sc-row"><label>発注担当</label><input id="pt-${supId}" value="${esc(getTantou(s))}" oninput="livePreview('${supId}')"></div>
-        <div class="sc-row"><label>連絡事項</label><textarea id="pm-${supId}" rows="2" placeholder="発注先への連絡があれば入力（発注書の下部に印刷）" oninput="livePreview('${supId}')"></textarea></div>
+      const editH = editingOrders[supId] ? historyData.find(x=>x.id===editingOrders[supId]) : null;
+      const memo0 = editH ? (editH.memo||'') : '';
+      const tantou0 = editH && editH.tantou ? editH.tantou : getTantou(s);
+      return `${editH?`<div class="search-hint" style="color:var(--amber);font-weight:700">↻ ${esc(editH.date)} の発注の再発行です（印刷すると履歴が更新されます）</div>`:''}
+      <div class="sheet-controls">
+        <div class="sc-row"><label>発注担当</label><input id="pt-${supId}" value="${esc(tantou0)}" oninput="livePreview('${supId}')"></div>
+        <div class="sc-row"><label>連絡事項</label><textarea id="pm-${supId}" rows="2" placeholder="発注先への連絡があれば入力（発注書の下部に印刷）" oninput="livePreview('${supId}')">${esc(memo0)}</textarea></div>
       </div>
-      <div class="sheet">${orderSheetHtml(supId, groups[supId])}</div>`;
+      <div class="sheet">${orderSheetHtml(supId, groups[supId], tantou0, memo0)}</div>`;
     }).join('');
   document.getElementById('previewOverlay').classList.add('show');
 }
@@ -1045,17 +1109,28 @@ function printAndConfirm(){
   closePreview();
   setTimeout(()=>{
     window.print();
-    // 履歴へ登録
+    // 履歴へ登録（再発行編集中なら元の履歴を上書き）
     const date = todayStr();
     Object.keys(groups).forEach(supId=>{
       const s = supById(supId);
-      historyData.unshift({
-        id: Date.now()+Math.floor(Math.random()*1000),
-        date, supplier:s.name, supplierId:supId,
-        items: groups[supId].map(c=>({name:c.name, qty:c.qty, unit:c.unit, size:c.size||'', note:c.note||''})),
-        memo: memos[supId]||'', tantou: tantous[supId],
-        status:'ordered'
-      });
+      const lineItems = groups[supId].map(c=>({name:c.name, qty:c.qty, unit:c.unit, size:c.size||'', note:c.note||''}));
+      const editH = editingOrders[supId] ? historyData.find(x=>x.id===editingOrders[supId]) : null;
+      if(editH){
+        editH.date = date;
+        editH.items = lineItems;
+        editH.memo = memos[supId]||'';
+        editH.tantou = tantous[supId];
+        editH.status = 'ordered';
+        delete editingOrders[supId];
+      }else{
+        historyData.unshift({
+          id: Date.now()+Math.floor(Math.random()*1000),
+          date, supplier:s.name, supplierId:supId,
+          items: lineItems,
+          memo: memos[supId]||'', tantou: tantous[supId],
+          status:'ordered'
+        });
+      }
     });
     cart = [];
     saveState(); renderCart(); updateCartBar(); renderSuppliers(); renderItems();
@@ -1098,8 +1173,10 @@ function renderHistory(){
       </div>
       <div class="hist-items">${h.items.map(i=>`${esc(i.name)}${i.size?`［${esc(i.size)}］`:''} × ${i.qty}${esc(i.unit)}${i.note?` <span style="color:#8a978f">（${esc(i.note)}）</span>`:''}`).join('<br>')}</div>
       ${h.memo?`<div class="hist-items" style="border-top:1px dashed var(--line);padding-top:5px">📝 連絡事項：${esc(h.memo)}</div>`:''}
+      ${h.slipNo?`<div class="hist-items" style="color:#8a978f;font-size:12px">📄 納品書（伝票No.${esc(h.slipNo)}）から取込</div>`:''}
       <div class="hist-btns">
         <button class="ok" onclick="toggleReceived(${h.id})">${h.status==='received'?'↩ 入荷取消':'✓ 入荷確認'}</button>
+        <button onclick="editOrder(${h.id})">✎ 編集して再印刷</button>
         <button onclick="reorder(${h.id})">🔁 同じ内容で発注</button>
       </div>
     </div>`).join('');
@@ -1120,6 +1197,22 @@ function reorder(id){
     if(idx>=0) cart[idx].qty = hi.qty;
     else cart.push({supplierId:supId, itemId, name:hi.name, qty:hi.qty, unit:hi.unit, size:hi.size||'', note:hi.note||''});
   });
+  saveState(); updateCartBar(); renderSuppliers();
+  showTab('cart');
+}
+// 確定済みの発注をカートに戻して編集（再印刷すると履歴が上書きされる）
+function editOrder(id){
+  const h = historyData.find(x=>x.id===id); if(!h) return;
+  const supId = h.supplierId || (suppliers.find(s=>s.name===h.supplier)||{}).id;
+  if(!supId){ alert('発注先が見つかりません'); return; }
+  if(!confirm(`${h.date} の ${h.supplier} の発注をカートに戻して編集しますか？\n（品目を追加・変更して印刷し直すと、この履歴が更新されます）`)) return;
+  // その発注先の既存カート行は置き換える
+  cart = cart.filter(c=>c.supplierId!==supId);
+  h.items.forEach(hi=>{
+    const it = (items[supId]?.items||[]).find(i=>i.name===hi.name);
+    cart.push({supplierId:supId, itemId: it?it.id:'ghost_'+hi.name, name:hi.name, qty:hi.qty, unit:hi.unit, size:hi.size||'', note:hi.note||''});
+  });
+  editingOrders[supId] = id;
   saveState(); updateCartBar(); renderSuppliers();
   showTab('cart');
 }
